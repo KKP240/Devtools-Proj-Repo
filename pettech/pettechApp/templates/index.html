@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}หน้าหลัก - PetTech{% endblock title %}
+{% block head %}
+  <h1 class="text-2xl font-semibold text-gray-900">ค้นหา พี่เลี้ยงสัตว์</h1>
+{% endblock head %}
+
+{% block content %}
+<div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  {% for c in caregivers %}
+    <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
+      <a href="{% url 'caregiver' c.pk %}">
+        <div class="h-48 bg-gray-100 flex items-center justify-center">
+          <!-- placeholder image -->
+          <span class="text-gray-400">Photo</span>
+        </div>
+      </a>
+      <div class="p-4">
+        <h2 class="text-lg font-semibold text-gray-800">
+          <a href="{% url 'caregiver' c.pk %}" class="hover:text-blue-600">{{ c.user.get_full_name|default:c.user.username }}</a>
+        </h2>
+        <p class="text-sm text-gray-500 mb-2">Rate: ฿{{ c.hourly_rate }}</p>
+        <p class="text-gray-600 text-sm line-clamp-3">{{ c.bio|truncatechars:120 }}</p>
+      </div>
+    </div>
+  {% empty %}
+    <p class="text-gray-500">ยังไม่มีพี่เลี้ยงในระบบ</p>
+  {% endfor %}
+</div>
+{% endblock content %}

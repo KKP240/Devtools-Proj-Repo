@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ caregiver.user.get_full_name|default:caregiver.user.username }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto bg-white p-6 rounded shadow">
+  <h2 class="text-2xl font-semibold mb-2">{{ caregiver.user.get_full_name|default:caregiver.user.username }}</h2>
+  <p class="text-sm text-gray-500 mb-4">Area: {{ caregiver.area }} — Rate: ฿{{ caregiver.hourly_rate }}</p>
+  <div class="mb-4">
+    <h3 class="font-semibold">About</h3>
+    <p class="text-gray-700">{{ caregiver.bio|default:"No description" }}</p>
+  </div>
+
+  <div class="mb-6">
+    <h3 class="font-semibold">Book this sitter</h3>
+    {% if request.user.is_authenticated %}
+      <form method="post" action="{% url 'pettechApp:booking_create' caregiver.pk %}">
+        {% csrf_token %}
+        {{ booking_form.non_field_errors }}
+        <div class="grid sm:grid-cols-2 gap-4">
+          {{ booking_form.pet.label_tag }} {{ booking_form.pet }}
+          {{ booking_form.start.label_tag }} {{ booking_form.start }}
+          {{ booking_form.end.label_tag }} {{ booking_form.end }}
+        </div>
+        <div class="mt-4">
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Request Booking</button>
+        </div>
+      </form>
+    {% else %}
+      <p>กรุณา <a href="{% url 'pettechApp:login' %}" class="text-blue-600">เข้าสู่ระบบ</a> เพื่อจอง</p>
+    {% endif %}
+  </div>
+
+  <div>
+    <h3 class="font-semibold">Reviews</h3>
+    {% for r in reviews %}
+      <div class="border-b py-2">
+        <div class="text-sm font-medium">{{ r.user.username }} — {{ r.rating }}/5</div>
+        <div class="text-gray-700">{{ r.comment }}</div>
+      </div>
+    {% empty %}
+      <p class="text-gray-500">ยังไม่มีรีวิว</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock content %}

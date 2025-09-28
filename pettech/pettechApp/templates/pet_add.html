@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}เพิ่มสัตว์เลี้ยง{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto bg-white p-6 rounded shadow">
+  <h2 class="text-xl font-semibold mb-4">เพิ่มสัตว์เลี้ยงของคุณ</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium">Name</label>
+        {{ form.name }}
+      </div>
+      <div>
+        <label class="block text-sm font-medium">Species</label>
+        {{ form.species }}
+      </div>
+      <div>
+        <label class="block text-sm font-medium">Age</label>
+        {{ form.age }}
+      </div>
+      <div>
+        <label class="block text-sm font-medium">Notes</label>
+        {{ form.notes }}
+      </div>
+      <div>
+        <label class="block text-sm font-medium">Photo</label>
+        {{ form.photo }}
+      </div>
+      <div>
+        <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded">Add Pet</button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock content %}

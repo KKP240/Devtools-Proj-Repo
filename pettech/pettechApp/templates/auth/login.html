@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto bg-white p-6 rounded shadow">
+  <h2 class="text-xl font-semibold mb-4">Login</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="space-y-3">
+      <div>{{ form.username.label_tag }} {{ form.username }}</div>
+      <div>{{ form.password.label_tag }} {{ form.password }}</div>
+      <div><button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Login</button></div>
+    </div>
+  </form>
+</div>
+{% endblock %}

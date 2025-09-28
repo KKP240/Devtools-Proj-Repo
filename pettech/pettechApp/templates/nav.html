@@ -1,0 +1,74 @@
+{% load static %}
+
+<!-- nav.html (PetTech) -->
+<header class="z-50 bg-white/70 backdrop-blur-sm border-b">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <!-- left -->
+      <div class="flex items-center gap-6">
+        <a href="{% url 'home' %}" class="flex items-center gap-2">
+          <img src="{% static 'pettechApp/img/logo.svg' %}" alt="PetTech" class="h-8 w-8" />
+          <span class="text-xl font-bold text-green-600 select-none">PetTech</span>
+        </a>
+
+        <nav class="hidden md:flex items-center gap-4 text-sm">
+          <a href="{% url 'home' %}" class="hover:text-green-600 transition">Home</a>
+          <a href="{% url 'caregiver_list' %}" class="hover:text-green-600 transition">Find Sitters</a>
+          <a href="{% url 'pet_add' %}" class="hover:text-green-600 transition">Add Pet</a>
+        </nav>
+      </div>
+
+      <!-- right -->
+      <div class="flex items-center gap-4">
+        <!-- Search -->
+        <form method="get" action="{% url 'caregiver_list' %}" class="hidden sm:flex items-center gap-2">
+          <input type="search" name="q" placeholder="ค้นหา พี่เลี้ยง หรือ พื้นที่..." value="{{ request.GET.q|default:'' }}" class="rounded-md border px-3 py-1.5 text-sm" />
+          <button class="px-3 py-1.5 rounded-md bg-green-600 text-white text-sm">Search</button>
+        </form>
+
+        <!-- user / auth -->
+        {% if request.user.is_authenticated %}
+          <div class="relative">
+            <!-- Profile button -->
+            <button onclick="document.getElementById('user-dropdown').classList.toggle('hidden')" class="flex items-center gap-2 text-sm rounded-md hover:bg-gray-100 px-2 py-1">
+              <span class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-sm text-gray-600">
+                {{ request.user.username|slice:":1"|upper }}
+              </span>
+              <span class="hidden sm:inline">{{ request.user.get_full_name|default:request.user.username }}</span>
+              <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+
+            <!-- Dropdown -->
+            <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white border rounded shadow z-50">
+              <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100">Profile</a>
+              <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100">Activity</a>
+              <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100">Created events</a>
+              <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Logout</button>
+              </form>
+            </div>
+          </div>
+        {% else %}
+          <div class="text-sm">
+            <a href="{% url 'login' %}" class="text-green-600 hover:underline mr-3">Login</a>
+            <a href="{% url 'register' %}" class="text-green-600 hover:underline">Register</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- small script to close dropdown on click outside -->
+<script>
+  document.addEventListener('click', function(e){
+    const dropdown = document.getElementById('user-dropdown');
+    if (!dropdown) return;
+    const button = e.target.closest('button');
+    const isTrigger = button && (button.parentElement && button.parentElement.contains(dropdown) || button === dropdown);
+    if (!isTrigger && !dropdown.classList.contains('hidden')) {
+      dropdown.classList.add('hidden');
+    }
+  });
+</script>

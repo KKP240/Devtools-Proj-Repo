@@ -1,0 +1,24 @@
+".myvenv/" 
+"__pycache__/" 
+"*.pyc" 
+
+# Python
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# venv
+.myvenv/
+
+# env files
+.env
+.env.local
+
+# Django
+db.sqlite3
+media/
+staticfiles/
+
+# Docker
+docker-compose.override.yml

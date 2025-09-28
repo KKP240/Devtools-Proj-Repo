@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}พี่เลี้ยงทั้งหมด{% endblock %}
+{% block head %}
+  <h1 class="text-2xl font-semibold text-gray-900">พี่เลี้ยงทั้งหมด</h1>
+{% endblock head %}
+{% block content %}
+<form method="get" class="mb-4">
+  <input name="q" value="{{ query }}" placeholder="ค้นหา..." class="rounded-md border px-3 py-2"/>
+  <button class="px-3 py-1.5 bg-blue-600 text-white rounded">ค้นหา</button>
+</form>
+
+<ul class="space-y-4">
+  {% for c in caregivers %}
+    <li class="p-4 bg-white rounded shadow">
+      <a href="{% url 'pettechApp:caregiver_detail' c.pk %}" class="text-lg font-medium">{{ c.user.username }}</a>
+      <div class="text-sm text-gray-500">Area: {{ c.area }} — Rate ฿{{ c.hourly_rate }}</div>
+    </li>
+  {% empty %}
+    <li>ไม่มีข้อมูล</li>
+  {% endfor %}
+</ul>
+{% endblock content %}
