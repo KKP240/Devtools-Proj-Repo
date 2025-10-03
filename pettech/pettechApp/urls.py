@@ -8,11 +8,21 @@ urlpatterns = [
 
     path('pets/add/', views.pet_add, name='pet_add'),
 
-    path('booking/create/<int:caregiver_id>/', views.booking_create, name='booking_create'),
-    path('bookings/', views.my_bookings, name='my_bookings'),
+    # Job Post URLs
+    path('job-posts/', views.job_post_list, name='job_post_list'),
+    path('job-posts/create/', views.job_post_create, name='job_post_create'),
+    path('job-posts/<int:pk>/', views.job_post_detail, name='job_post_detail'),
 
-    # auth
-    path('register/', views.register_view, name='register'),
-    path('login/', views.login_view, name='login'),
-    path('logout/', views.logout_view, name='logout'),
+    # Proposal URLs
+    path('job-posts/<int:job_post_id>/propose/', views.proposal_submit, name='proposal_submit'),
+    path('job-posts/<int:job_post_id>/proposals/<int:proposal_id>/accept/', views.proposal_accept, name='proposal_accept'),
+
+    # Booking URLs
+    path('bookings/', views.my_bookings, name='my_bookings'),
+    #path('bookings/<int:booking_id>/review/', views.review_create, name='review_create'),
+    
+    # Authentication URLs
+    path("login/", views.LoginView.as_view(), name="login"),
+    path("logout/", views.LogoutView.as_view(), name="logout"),
+    path("register/", views.register, name="register"),
 ]

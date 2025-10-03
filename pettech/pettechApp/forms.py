@@ -1,22 +1,27 @@
 from django import forms
-from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import Pet, CaregiverProfile, Booking, Review
-
-User = get_user_model()
+from .models import Pet, CaregiverProfile, Booking, Review, JobPost, Proposal, User
 
 WEEKDAY_CHOICES = [
-    ('Mon','Mon'), ('Tue','Tue'), ('Wed','Wed'),
-    ('Thu','Thu'), ('Fri','Fri'), ('Sat','Sat'), ('Sun','Sun')
+    ('Mon', 'Mon'), ('Tue', 'Tue'), ('Wed', 'Wed'),
+    ('Thu', 'Thu'), ('Fri', 'Fri'), ('Sat', 'Sat'), ('Sun', 'Sun')
 ]
 
-class RegisterForm(UserCreationForm):
-    email = forms.EmailField(required=True)
-    is_caregiver = forms.BooleanField(required=False, initial=False, label="สมัครเป็นพี่เลี้ยง")
+class RegisterForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput)
+    confirm_password = forms.CharField(widget=forms.PasswordInput)
 
     class Meta:
         model = User
-        fields = ("username", "email", "is_caregiver", "password1", "password2")
+        fields = ['username', 'email', 'password', 'confirm_password']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        pw = cleaned_data.get('password')
+        confirm_pw = cleaned_data.get('confirm_password')
+        if pw != confirm_pw:
+            raise forms.ValidationError("Passwords do not match.")
+        return cleaned_data
 
 class LoginForm(AuthenticationForm):
     username = forms.CharField(widget=forms.TextInput(attrs={'autofocus': True}))
@@ -31,7 +36,6 @@ class PetForm(forms.ModelForm):
         }
 
 class CaregiverProfileForm(forms.ModelForm):
-    # available_days in model is JSONField(list) — we expose as MultipleChoice here
     available_days = forms.MultipleChoiceField(
         choices=WEEKDAY_CHOICES,
         widget=forms.CheckboxSelectMultiple,
@@ -44,7 +48,6 @@ class CaregiverProfileForm(forms.ModelForm):
 
     def clean_available_days(self):
         days = self.cleaned_data.get("available_days", [])
-        # store list (JSONField will accept)
         return list(days)
 
 class BookingForm(forms.ModelForm):
@@ -55,6 +58,14 @@ class BookingForm(forms.ModelForm):
         model = Booking
         fields = ["pet", "start", "end"]
 
+    def clean(self):
+        cleaned_data = super().clean()
+        start = cleaned_data.get('start')
+        end = cleaned_data.get('end')
+        if start and end and start >= end:
+            raise forms.ValidationError("End time must be after start time.")
+        return cleaned_data
+
 class ReviewForm(forms.ModelForm):
     class Meta:
         model = Review
@@ -62,3 +73,41 @@ class ReviewForm(forms.ModelForm):
         widgets = {
             "comment": forms.Textarea(attrs={"rows": 3}),
         }
+
+class JobPostForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if user:
+            self.fields['pet'].queryset = Pet.objects.filter(owner=user)
+
+    class Meta:
+        model = JobPost
+        fields = ["title", "description", "pet", "start", "end", "location", "budget"]
+        widgets = {
+            "start": forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            "end": forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            "description": forms.Textarea(attrs={"rows": 4}),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        start = cleaned_data.get('start')
+        end = cleaned_data.get('end')
+        if start and end and start >= end:
+            raise forms.ValidationError("End time must be after start time.")
+        return cleaned_data
+
+class ProposalForm(forms.ModelForm):
+    class Meta:
+        model = Proposal
+        fields = ["message", "proposed_rate"]
+        widgets = {
+            "message": forms.Textarea(attrs={"rows": 3}),
+        }
+
+    def clean_proposed_rate(self):
+        rate = self.cleaned_data.get('proposed_rate')
+        if rate <= 0:
+            raise forms.ValidationError("Proposed rate must be positive.")
+        return rate
