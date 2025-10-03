@@ -13,6 +13,8 @@ from .forms import (
     BookingForm, ReviewForm, JobPostForm, ProposalForm
 )
 
+
+
 def home(request):
     caregivers = CaregiverProfile.objects.select_related('user').all()[:12]
     job_posts = JobPost.objects.filter(status='open').select_related('owner', 'pet')[:12]

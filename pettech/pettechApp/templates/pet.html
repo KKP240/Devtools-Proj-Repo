@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}สัตว์เลี้ยง - PetTech{% endblock title %}
+
+{% block head %}
+  <h1 class="text-2xl font-semibold text-gray-900">รายการสัตว์เลี้ยง</h1>
+{% endblock head %}
+
+{% block content %}
+<div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  {% for p in pet %}
+    <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
+      <div class="h-48 bg-gray-100 flex items-center justify-center">
+        {% if p.photo %}
+          <img src="{{ p.photo }}" alt="{{ p.name }}" class="h-full w-full object-cover">
+        {% else %}
+          <span class="text-gray-400">No Photo</span>
+        {% endif %}
+      </div>
+      <div class="p-4">
+        <h2 class="text-lg font-semibold text-gray-800">{{ p.name }}</h2>
+        <p class="text-sm text-gray-500">ชนิด: {{ p.species }}</p>
+        {% if p.age %}
+          <p class="text-sm text-gray-500">อายุ: {{ p.age }} ปี</p>
+        {% endif %}
+        <p class="text-gray-600 text-sm mt-2">{{ p.notes|default:"-" }}</p>
+        <p class="text-xs text-gray-400 mt-1">เจ้าของ: {{ p.owner.username }}</p>
+      </div>
+    </div>
+  {% empty %}
+    <p class="text-gray-500">ยังไม่มีสัตว์เลี้ยงในระบบ</p>
+  {% endfor %}
+</div>
+{% endblock content %}

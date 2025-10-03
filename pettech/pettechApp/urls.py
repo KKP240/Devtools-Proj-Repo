@@ -2,9 +2,22 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    # พี่เลี้ยงจอง
+
+    # Home แสดง posts ของทุกคน มีปุ่มให้เพิ่ม posts ใหม่
+    # My posts 
+    # createPosts, editPosts
+    # userProfile
+    # postDetail
+    # bookings
+    # bookingHistory
+
+
+    # Auth
     path('', views.home, name='home'),
     path('caregivers/', views.caregiver_list, name='caregiver_list'),
     path('caregiver/<int:pk>/', views.caregiver_detail, name='caregiver_detail'),
+    path('pet/', views.pet_list, name='pet_list'),
 
     path('pets/add/', views.pet_add, name='pet_add'),
 
