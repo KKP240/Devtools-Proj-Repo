@@ -11,6 +11,8 @@ from .forms import (
     BookingForm, ReviewForm
 )
 
+
+
 def home(request):
     # show featured caregivers on home
     caregivers = CaregiverProfile.objects.select_related('user').all()[:12]
@@ -100,3 +102,7 @@ def logout_view(request):
     logout(request)
     messages.success(request, "Logged out.")
     return redirect('home')
+
+def pet_list(request):
+    pet = Pet.objects.select_related('owner').all()[:12]
+    return render(request, 'pet.html', {'pet': pet})
