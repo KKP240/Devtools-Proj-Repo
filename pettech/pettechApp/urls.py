@@ -17,7 +17,6 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('caregivers/', views.caregiver_list, name='caregiver_list'),
     path('caregiver/<int:pk>/', views.caregiver_detail, name='caregiver_detail'),
-    path('pet/', views.pet_list, name='pet_list'),
 
     # Job Post URLs
     path('job-posts/', views.job_post_list, name='job_post_list'),
