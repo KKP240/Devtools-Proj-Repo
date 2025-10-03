@@ -14,16 +14,13 @@ from .forms import (
 )
 
 def home(request):
-    caregivers = CaregiverProfile.objects.select_related('user').all()[:12]
+    search_query = request.GET.get('search', '')
+    if search_query:
+        job_posts = JobPost.objects.filter(status='open', title__icontains=search_query).select_related('owner', 'pet')[:12]
+        return render(request, 'index.html', {'job_posts': job_posts, 'search_query': search_query})
+ 
     job_posts = JobPost.objects.filter(status='open').select_related('owner', 'pet')[:12]
-    return render(request, 'index.html', {'caregivers': caregivers, 'job_posts': job_posts})
-
-def caregiver_list(request):
-    q = request.GET.get('q', '')
-    qs = CaregiverProfile.objects.select_related('user').all()
-    if q:
-        qs = qs.filter(user__username__icontains=q)
-    return render(request, 'caregiver_list.html', {'caregivers': qs, 'query': q})
+    return render(request, 'index.html', {'job_posts': job_posts})
 
 def caregiver_detail(request, pk):
     caregiver = get_object_or_404(CaregiverProfile, pk=pk)
@@ -32,20 +29,6 @@ def caregiver_detail(request, pk):
         'caregiver': caregiver,
         'reviews': reviews,
     })
-
-@login_required
-def pet_add(request):
-    if request.method == 'POST':
-        form = PetForm(request.POST, request.FILES)
-        if form.is_valid():
-            pet = form.save(commit=False)
-            pet.owner = request.user
-            pet.save()
-            messages.success(request, "Pet added.")
-            return redirect('home')
-    else:
-        form = PetForm()
-    return render(request, 'pet_add.html', {'form': form})
 
 @login_required
 def job_post_create(request):
@@ -60,13 +43,6 @@ def job_post_create(request):
     else:
         form = JobPostForm(user=request.user)  # Pass user to filter pets
     return render(request, 'job_post_create.html', {'form': form})
-
-def job_post_list(request):
-    q = request.GET.get('q', '')
-    qs = JobPost.objects.filter(status='open').select_related('owner', 'pet')
-    if q:
-        qs = qs.filter(title__icontains=q)
-    return render(request, 'job_post_list.html', {'job_posts': qs, 'query': q})
 
 def job_post_detail(request, pk):
     job_post = get_object_or_404(JobPost, pk=pk)
@@ -125,9 +101,23 @@ def proposal_accept(request, job_post_id, proposal_id):
     return redirect('my_bookings')
 
 @login_required
+def myposts(request):
+    job_posts = JobPost.objects.filter(owner=request.user).select_related('pet')
+    return render(request, 'myposts.html', {'job_posts': job_posts})
+
+@login_required
 def my_bookings(request):
     bookings = Booking.objects.filter(owner=request.user).select_related('caregiver', 'pet')
     return render(request, 'my_bookings.html', {'bookings': bookings})
+
+@login_required
+def my_booking_history(request):
+    bookings = Booking.objects.filter(owner=request.user, status='D').select_related('caregiver', 'pet')
+    return render(request, 'booking_history.html', {'bookings': bookings})
+
+@login_required
+def myprofile(request):
+    return render(request, 'myprofile.html')
 
 def register(request):
     if request.method == 'POST':

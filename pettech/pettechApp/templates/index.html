@@ -3,36 +3,15 @@
 
 {% block title %}หน้าหลัก - PetTech{% endblock title %}
 {% block head %}
-  <h1 class="text-2xl font-semibold text-gray-900">ค้นหา พี่เลี้ยงสัตว์ และ งานดูแลสัตว์เลี้ยง</h1>
+  <div class="container-header mx-auto w-[70%]">
+    <h1 class="text-2xl font-semibold text-gray-900">ค้นหางานดูแลสัตว์เลี้ยง</h1>
+    <form action="{% url 'home' %}" method="GET" class="mt-2">
+      <input type="text" value="{{ search_query }}" name="search" id="search" placeholder="ค้นหางาน..." class="w-full mt-2 p-2 border border-gray-300 rounded-md">
+    </form>
+  </div>
 {% endblock head %}
 
 {% block content %}
-<!-- Caregivers Section -->
-<div class="mt-6">
-  <h2 class="text-xl font-semibold text-gray-800 mb-4">พี่เลี้ยงสัตว์</h2>
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    {% for c in caregivers %}
-      <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-        <a href="{% url 'caregiver_detail' c.pk %}">
-          <div class="h-48 bg-gray-100 flex items-center justify-center">
-            <!-- Placeholder image or caregiver photo -->
-            <span class="text-gray-400">Photo</span>
-          </div>
-        </a>
-        <div class="p-4">
-          <h3 class="text-lg font-semibold text-gray-800">
-            <a href="{% url 'caregiver_detail' c.pk %}" class="hover:text-blue-600">{{ c.user.get_full_name|default:c.user.username }}</a>
-          </h3>
-          <p class="text-sm text-gray-500 mb-2">Rate: ฿{{ c.hourly_rate }}</p>
-          <p class="text-gray-600 text-sm line-clamp-3">{{ c.bio|truncatechars:120 }}</p>
-        </div>
-      </div>
-    {% empty %}
-      <p class="text-gray-500">ยังไม่มีพี่เลี้ยงในระบบ</p>
-    {% endfor %}
-  </div>
-</div>
-
 <!-- Job Posts Section -->
 <div class="mt-12">
   <h2 class="text-xl font-semibold text-gray-800 mb-4">งานดูแลสัตว์เลี้ยง</h2>
