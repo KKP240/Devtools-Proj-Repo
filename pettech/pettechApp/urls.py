@@ -19,8 +19,6 @@ urlpatterns = [
     path('caregiver/<int:pk>/', views.caregiver_detail, name='caregiver_detail'),
     path('pet/', views.pet_list, name='pet_list'),
 
-    path('pets/add/', views.pet_add, name='pet_add'),
-
     # Job Post URLs
     path('job-posts/', views.job_post_list, name='job_post_list'),
     path('job-posts/create/', views.job_post_create, name='job_post_create'),
@@ -33,7 +31,7 @@ urlpatterns = [
     # Booking URLs
     path('bookings/', views.my_bookings, name='my_bookings'),
     #path('bookings/<int:booking_id>/review/', views.review_create, name='review_create'),
-    
+
     # Authentication URLs
     path("login/", views.LoginView.as_view(), name="login"),
     path("logout/", views.LogoutView.as_view(), name="logout"),
