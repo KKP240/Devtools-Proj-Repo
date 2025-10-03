@@ -13,7 +13,7 @@
 <ul class="space-y-4">
   {% for c in caregivers %}
     <li class="p-4 bg-white rounded shadow">
-      <a href="{% url 'pettechApp:caregiver_detail' c.pk %}" class="text-lg font-medium">{{ c.user.username }}</a>
+      <a href="{% url 'caregiver_detail' c.pk %}" class="text-lg font-medium">{{ c.user.username }}</a>
       <div class="text-sm text-gray-500">Area: {{ c.area }} — Rate ฿{{ c.hourly_rate }}</div>
     </li>
   {% empty %}

@@ -10,7 +10,7 @@
 <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
   {% for c in caregivers %}
     <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-      <a href="{% url 'caregiver' c.pk %}">
+      <a href="{% url 'caregiver_detail' c.pk %}">
         <div class="h-48 bg-gray-100 flex items-center justify-center">
           <!-- placeholder image -->
           <span class="text-gray-400">Photo</span>
@@ -18,7 +18,7 @@
       </a>
       <div class="p-4">
         <h2 class="text-lg font-semibold text-gray-800">
-          <a href="{% url 'caregiver' c.pk %}" class="hover:text-blue-600">{{ c.user.get_full_name|default:c.user.username }}</a>
+          <a href="{% url 'caregiver_detail' c.pk %}" class="hover:text-blue-600">{{ c.user.get_full_name|default:c.user.username }}</a>
         </h2>
         <p class="text-sm text-gray-500 mb-2">Rate: ฿{{ c.hourly_rate }}</p>
         <p class="text-gray-600 text-sm line-clamp-3">{{ c.bio|truncatechars:120 }}</p>

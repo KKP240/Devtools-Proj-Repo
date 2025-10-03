@@ -14,7 +14,7 @@
   <div class="mb-6">
     <h3 class="font-semibold">Book this sitter</h3>
     {% if request.user.is_authenticated %}
-      <form method="post" action="{% url 'pettechApp:booking_create' caregiver.pk %}">
+      <form method="post" action="{% url 'booking_create' caregiver.pk %}">
         {% csrf_token %}
         {{ booking_form.non_field_errors }}
         <div class="grid sm:grid-cols-2 gap-4">
@@ -27,7 +27,7 @@
         </div>
       </form>
     {% else %}
-      <p>กรุณา <a href="{% url 'pettechApp:login' %}" class="text-blue-600">เข้าสู่ระบบ</a> เพื่อจอง</p>
+      <p>กรุณา <a href="{% url 'login' %}" class="text-blue-600">เข้าสู่ระบบ</a> เพื่อจอง</p>
     {% endif %}
   </div>
 
