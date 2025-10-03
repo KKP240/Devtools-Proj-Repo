@@ -28,7 +28,12 @@
    git clone https://github.com/KKP240/Devtools-Proj-Repo.git
    cd Devtools-Proj
    ```
-
+   **PIP Install**
+   ```bash
+   pip install django djangorestframework psycopg2-binary python-dotenv gunicorn
+   pip install djangorestframework-simplejwt
+   ```
+   
 2. **สร้างและเปิดใช้งาน Virtual Environment**
    - บน Windows:
      ```bash
