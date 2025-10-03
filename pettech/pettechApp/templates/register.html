@@ -61,25 +61,6 @@
           {% endif %}
         </div>
 
-        <!-- Caregiver Checkbox -->
-        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-          <div class="flex items-start">
-            <div class="flex items-center h-5">
-              <input type="checkbox" name="{{ form.is_caregiver.name }}" id="{{ form.is_caregiver.id_for_label }}"
-                     class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
-            </div>
-            <div class="ml-3">
-              <label for="{{ form.is_caregiver.id_for_label }}" class="font-medium text-gray-900 text-sm cursor-pointer">
-                I want to be a pet caregiver
-              </label>
-              <p class="text-xs text-gray-600 mt-1">Check this if you want to offer pet sitting services</p>
-            </div>
-          </div>
-          {% if form.is_caregiver.errors %}
-          <p class="mt-2 text-sm text-red-600">{{ form.is_caregiver.errors.0 }}</p>
-          {% endif %}
-        </div>
-
         <!-- Password 1 -->
         <div>
           <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
