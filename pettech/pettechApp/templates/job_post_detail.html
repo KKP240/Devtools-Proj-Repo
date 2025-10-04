@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}PetTech{% endblock title %}
+{% block head %}
+  <div class="header-detail max-w-3xl mx-auto bg-white p-6 rounded shadow">
+    <h1 class="text-3xl font-bold text-gray-800">รายละเอียดงานดูแลสัตว์เลี้ยง</h1>
+  </div>
+  
+{% endblock head %}
+
+{% block content %}
+  <div class="max-w-3xl mx-auto bg-white p-6 rounded shadow">
+    <h2 class="text-2xl font-semibold mb-4">{{ job_post.title }}</h2>
+    <p class="text-gray-600 mb-2">สัตว์เลี้ยง: {{ job_post.pet.name }} ({{ job_post.pet.species }})</p>
+    <p class="text-gray-600 mb-2">วันที่: {{ job_post.start|date:"d M Y H:i" }} - {{ job_post.end|date:"d M Y H:i" }}</p>
+    <p class="text-gray-600 mb-2">สถานที่: {{ job_post.location }}</p>
+    <p class="text-gray-600 mb-4">งบประมาณ: {% if job_post.budget %}฿{{ job_post.budget }}{% else %}ไม่ระบุ{% endif %}</p>
+    <p class="text-gray-800 mb-6">{{ job_post.description }}</p>
+
+    {% if user == job_post.owner %}
+      <h3 class="text-xl font-semibold mb-4 text-blue-600">ข้อเสนอที่ได้รับ</h3>
+      {% if proposals %}
+        <ul class="space-y-4">
+          {% for proposal in proposals %}
+            <li class="border p-4 rounded">
+              <p class="text-gray-800"><strong>ผู้ดูแล:</strong> {{ proposal.caregiver.username }}</p>
+              <p class="text-gray-800"><strong>ข้อความ:</strong> {{ proposal.message }}</p>
+              <p class="text-gray-800"><strong>วันที่ส่ง:</strong> {{ proposal.created_at|date:"d M Y H:i" }}</p>
+              {% if job_post.status == 'open' %}
+                <form method="post" action="{% url 'proposal_accept' job_post.id proposal.id %}" class="mt-2">
+                  {% csrf_token %}
+                  <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">ยอมรับข้อเสนอ</button>
+                </form>
+              {% elif job_post.status == 'in_progress' and job_post.accepted_proposal == proposal %}
+                <span class="text-green-600 font-semibold">ข้อเสนอนี้ได้รับการยอมรับแล้ว</span>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-gray-500">ยังไม่มีข้อเสนอสำหรับงานนี้</p>
+      {% endif %}
+    {% else %}
+      <form action="{% url 'proposal_submit' job_post.id %}" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">รับงาน</button>
+      </form>
+    {% endif %}
+{% endblock content %}

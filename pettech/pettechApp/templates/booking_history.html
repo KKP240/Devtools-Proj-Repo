@@ -3,9 +3,88 @@
 
 {% block title %}Booking history{% endblock title %}
 {% block head %}
-  hello my booking history
+  <h1 class="text-2xl font-semibold text-gray-900">Booking history</h1>
 {% endblock head %}
 
 {% block content %}
-hello my booking history
+  <table class="table w-full mb-6">
+    <thead>
+      <tr class="border-b border-gray-300">
+        <th class="text-left text-sm font-medium text-gray-500 p-4">Id</th>
+        <th class="text-left text-sm font-medium text-gray-500 p-4">Job</th>
+        <th class="text-left text-sm font-medium text-gray-500 p-4">Owner</th>
+        <th class="text-left text-sm font-medium text-gray-500 p-4">Caregiver</th>
+        <th class="text-left text-sm font-medium text-gray-500 p-4">Pet</th>
+        <th class="text-left text-sm font-medium text-gray-500 p-4">Start Date</th>
+        <th class="text-left text-sm font-medium text-gray-500 p-4">End Date</th>
+        <th class="text-left text-sm font-medium text-gray-500 p-4">Status</th>
+        <th class="text-left text-sm font-medium text-gray-500 p-4">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if bookings %}
+        {% for booking in bookings %}
+          <tr class="border-b border-gray-200 hover:bg-gray-50">
+            <td class="p-4 text-sm text-gray-700">{{ booking.id }}</td>
+            <td class="p-4 text-sm text-gray-700">
+              <a href="{% url 'job_post_detail' booking.job_post.id %}" class="text-blue-600 hover:underline">
+                {{ booking.job_post.title }}
+              </a>
+            </td>
+            <td class="p-4 text-sm text-gray-700">{{ booking.job_post.owner.username }}</td>
+            <td class="p-4 text-sm text-gray-700">{{ booking.caregiver.username }}</td>
+            <td class="p-4 text-sm text-gray-700">{{ booking.job_post.pet.name }} ({{ booking.job_post.pet.species }})</td>
+            <td class="p-4 text-sm text-gray-700">{{ booking.job_post.start|date:"d M Y H:i" }}</td>
+            <td class="p-4 text-sm text-gray-700">{{ booking.job_post.end|date:"d M Y H:i" }}</td>
+            <td class="p-4 text-sm">
+              {% if booking.status == 'pending' %}
+                <span class="inline-block px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">Pending</span>
+              {% elif booking.status == 'accepted' %}
+                <span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">Accepted</span>
+              {% elif booking.status == 'completed' %}
+                <span class="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">Completed</span>
+              {% elif booking.status == 'canceled' %}
+                <span class="inline-block px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold">Canceled</span>
+              {% endif %}
+            </td>
+            <td class="p-4 text-sm text-gray-700">
+              <form action="{% url 'write_review' booking.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="text-blue-600 hover:underline">Write a Review</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+        <div class="modal-create-review">
+          <div class="modal-content-create-review">
+            <span class="close-create-review">&times;</span>
+            <h2 class="text-lg font-semibold mb-4">Write a Review</h2>
+            <form id="reviewForm" method="post" action="{% url 'write_review' booking.id %}">
+              {% csrf_token %}
+              <div class="mb-4">
+                <label for="rating" class="block text-sm font-medium text-gray-700 mb-1">Rating:</label>
+                <select id="rating" name="rating" class="w-full border border-gray-300 rounded-md p-2">
+                  <option value="1">1 Star</option>
+                  <option value="2">2 Stars</option>
+                  <option value="3">3 Stars</option>
+                  <option value="4">4 Stars</option>
+                  <option value="5">5 Stars</option>
+                </select>
+              </div>
+              <div class="mb-4">
+                <label for="comment" class="block text-sm font-medium text-gray-700 mb-1">Comment:</label>
+                <textarea id="comment" name="comment" rows="4" class="w-full border border-gray-300 rounded-md p-2" placeholder="Write your review here..."></textarea>
+              </div>
+              <div class="flex justify-end">
+                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors">Submit Review</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      {% else %}
+        <tr class="none-booking text-gray-500 text-[14px] text-center"><td colspan="8" class="p-4">No booking history yet.</td></tr>
+      {% endif %}
+    </tbody>
+  </table>
+  
 {% endblock content %}

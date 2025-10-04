@@ -88,7 +88,7 @@ def proposal_submit(request, job_post_id):
             return redirect('job_post_detail', pk=job_post_id)
     else:
         form = ProposalForm()
-    return render(request, 'proposal_submit.html', {'form': form, 'job_post': job_post})
+    return render(request, 'job_post_detail.html', {'form': form, 'job_post': job_post})
 
 @login_required
 def proposal_accept(request, job_post_id, proposal_id):
@@ -123,14 +123,36 @@ def myposts(request):
     return render(request, 'myposts.html', {'job_posts': job_posts})
 
 @login_required
-def my_bookings(request):
+def booking_detail(request):
     bookings = Booking.objects.filter(owner=request.user).select_related('caregiver', 'pet')
-    return render(request, 'my_bookings.html', {'bookings': bookings})
+    return render(request, 'booking_detail.html', {'bookings': bookings})
 
 @login_required
 def my_booking_history(request):
-    bookings = Booking.objects.filter(owner=request.user, status='D').select_related('caregiver', 'pet')
+    bookings = Booking.objects.filter(owner=request.user).select_related('caregiver', 'pet')
     return render(request, 'booking_history.html', {'bookings': bookings})
+
+@login_required
+def write_review(request, booking_id):
+    booking = get_object_or_404(Booking, pk=booking_id, owner=request.user, status='D')
+    if hasattr(booking, 'review'):
+        messages.error(request, "You have already reviewed this booking.")
+        return redirect('booking_history')
+    if request.method == 'GET':
+        form = ReviewForm()
+
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.booking = booking
+            review.save()
+            messages.success(request, "Review submitted successfully.")
+            return redirect('booking_history')
+    else:
+        form = ReviewForm()
+
+    return render(request, 'write_review.html', {'form': form, 'booking': booking})
 
 @login_required
 def myprofile(request):

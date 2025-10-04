@@ -26,13 +26,14 @@ urlpatterns = [
     path('job-posts/<int:job_post_id>/proposals/<int:proposal_id>/accept/', views.proposal_accept, name='proposal_accept'),
 
     # Booking URLs
-    path('bookings/', views.my_bookings, name='my_bookings'),
+    path('bookings/', views.booking_detail, name='booking_detail'),
     #path('bookings/<int:booking_id>/review/', views.review_create, name='review_create'),
 
     # User Profile URLs
     path('myprofile/', views.myprofile, name='myprofile'),
     path('booking-history/', views.my_booking_history, name='booking_history'),
     path('myposts/', views.myposts, name='myposts'),
+    path('write_review/<int:booking_id>/', views.write_review, name='write_review'),
 
     # Authentication URLs
     path("login/", views.LoginView.as_view(), name="login"),
