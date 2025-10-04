@@ -74,9 +74,27 @@ def job_post_detail(request, pk):
 @login_required
 def proposal_submit(request, job_post_id):
     job_post = get_object_or_404(JobPost, pk=job_post_id, status='open')
+    
+    # ตรวจสอบว่ามี caregiver profile หรือไม่
     if not hasattr(request.user, 'caregiver_profile'):
-        messages.error(request, "You need a caregiver profile to submit a proposal.")
+        messages.error(request, "คุณต้องมีโปรไฟล์ผู้ดูแลเพื่อส่งข้อเสนอ")
         return redirect('job_post_detail', pk=job_post_id)
+    
+    # ป้องกันไม่ให้ owner ส่งข้อเสนอให้งานของตัวเอง
+    if request.user == job_post.owner:
+        messages.error(request, "คุณไม่สามารถส่งข้อเสนอให้งานของตัวเองได้")
+        return redirect('job_post_detail', pk=job_post_id)
+    
+    # ตรวจสอบว่าเคยส่งข้อเสนอไปแล้วหรือยัง
+    existing_proposal = Proposal.objects.filter(
+        job_post=job_post, 
+        caregiver=request.user
+    ).first()
+    
+    if existing_proposal:
+        messages.warning(request, "คุณได้ส่งข้อเสนอสำหรับงานนี้ไปแล้ว")
+        return redirect('job_post_detail', pk=job_post_id)
+    
     if request.method == 'POST':
         form = ProposalForm(request.POST)
         if form.is_valid():
@@ -84,11 +102,19 @@ def proposal_submit(request, job_post_id):
             proposal.job_post = job_post
             proposal.caregiver = request.user
             proposal.save()
-            messages.success(request, "Proposal submitted.")
+            messages.success(request, "ส่งข้อเสนอเรียบร้อยแล้ว")
             return redirect('job_post_detail', pk=job_post_id)
-    else:
-        form = ProposalForm()
-    return render(request, 'job_post_detail.html', {'form': form, 'job_post': job_post})
+        else:
+            # ถ้า form ไม่ valid ให้แสดง error กลับไปที่หน้า detail พร้อม form
+            proposals = job_post.proposals.select_related('caregiver').all()
+            return render(request, 'job_post_detail.html', {
+                'job_post': job_post,
+                'proposals': proposals,
+                'proposal_form': form,  # ส่ง form ที่มี error กลับไป
+            })
+    
+    # ถ้าเป็น GET request ให้ redirect กลับไปหน้า detail
+    return redirect('job_post_detail', pk=job_post_id)
 
 @login_required
 def proposal_accept(request, job_post_id, proposal_id):
@@ -115,7 +141,7 @@ def proposal_accept(request, job_post_id, proposal_id):
     job_post.save()
     Proposal.objects.filter(job_post=job_post).exclude(id=proposal_id).update(status='rejected')
     messages.success(request, "Proposal accepted and booking created.")
-    return redirect('my_bookings')
+    return redirect('booking_detail')
 
 @login_required
 def myposts(request):
@@ -191,3 +217,24 @@ class LogoutView(View):
     def get(self, request):
         logout(request)
         return redirect('login')
+    
+@login_required
+def caregiver_register(request):
+
+    if request.method == 'POST':
+        print("DEBUG caregiver_register: POST by", request.user)  # debug
+        print("DEBUG POST data:", dict(request.POST))
+        form = CaregiverProfileForm(request.POST)
+        if form.is_valid():
+            caregiver_profile = form.save(commit=False)
+            caregiver_profile.user = request.user
+            caregiver_profile.save()
+            messages.success(request, "Caregiver profile created successfully.")
+            return redirect('myprofile')
+        else:
+            print("DEBUG caregiver_register errors:", form.errors)  # debug
+            messages.error(request, "มีข้อผิดพลาด: ดูคอนโซลเซิร์ฟเวอร์สำหรับรายละเอียด")
+    else:
+        form = CaregiverProfileForm()
+
+    return render(request, 'caregiver_register.html', {'form': form})

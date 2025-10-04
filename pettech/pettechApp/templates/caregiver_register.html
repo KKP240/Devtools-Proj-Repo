@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Booking{% endblock %}
+{% block content %}
+    
+    <div class=" max-w-3xl mx-auto bg-white p-6 rounded shadow">
+        <h2 class="text-lg font-medium mb-4 text-green-600">Register as a Caregiver</h2>
+        <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">Submit</button>
+    </form>
+    </div>
+<style>
+  input[type="text"],
+  textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+  }
+  input[type="number"] {
+    width: 10%;
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    -moz-appearance: textfield;
+  }
+  input[type="text"]:focus,
+  input[type="number"]:focus,
+  input[type="datetime-local"]:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    ring: 2px;
+    ring-color: #3b82f680;
+  }
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+  textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+  
+  input[type="file"] {
+    padding: 0.5rem 0;
+  }
+</style>
+{% endblock %}

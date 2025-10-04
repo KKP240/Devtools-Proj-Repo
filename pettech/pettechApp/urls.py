@@ -16,6 +16,7 @@ urlpatterns = [
     # Auth
     path('', views.home, name='home'),
     path('caregiver/<int:pk>/', views.caregiver_detail, name='caregiver_detail'),
+    path('caregiver/register/', views.caregiver_register, name='caregiver_register'),
 
     # Job Post URLs
     path('job-posts/create/', views.job_post_create, name='job_post_create'),
