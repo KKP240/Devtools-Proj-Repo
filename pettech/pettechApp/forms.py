@@ -33,6 +33,9 @@ class PetForm(forms.ModelForm):
         fields = ["name", "species", "age", "notes", "photo"]
         widgets = {
             "notes": forms.Textarea(attrs={"rows": 3}),
+            "photo": forms.URLInput(attrs={
+                'placeholder': 'https://example.com/photo.jpg (ไม่บังคับ)'
+            }),
         }
 
 class CaregiverProfileForm(forms.ModelForm):
@@ -74,20 +77,28 @@ class ReviewForm(forms.ModelForm):
             "comment": forms.Textarea(attrs={"rows": 3}),
         }
 
+# แก้ไข: ลบ field 'pet' ออก เพราะจะสร้างพร้อมกันกับ PetForm
 class JobPostForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
-        if user:
-            self.fields['pet'].queryset = Pet.objects.filter(owner=user)
 
     class Meta:
         model = JobPost
-        fields = ["title", "description", "pet", "start", "end", "location", "budget"]
+        fields = ["title", "description", "start", "end", "location", "budget"]
         widgets = {
-            "start": forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            "end": forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            "description": forms.Textarea(attrs={"rows": 4}),
+            "start": forms.DateTimeInput(attrs={
+                'type': 'datetime-local',
+                'class': 'form-control'
+            }),
+            "end": forms.DateTimeInput(attrs={
+                'type': 'datetime-local',
+                'class': 'form-control'
+            }),
+            "description": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
+            "title": forms.TextInput(attrs={"class": "form-control"}),
+            "location": forms.TextInput(attrs={"class": "form-control"}),
+            "budget": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
         }
 
     def clean(self):

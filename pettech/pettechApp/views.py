@@ -33,16 +33,33 @@ def caregiver_detail(request, pk):
 @login_required
 def job_post_create(request):
     if request.method == 'POST':
-        form = JobPostForm(request.POST)
-        if form.is_valid():
-            job_post = form.save(commit=False)
+        job_form = JobPostForm(request.POST, user=request.user)
+        pet_form = PetForm(request.POST, request.FILES)
+
+        if job_form.is_valid() and pet_form.is_valid():
+            pet = pet_form.save(commit=False)
+            pet.owner = request.user
+            pet.save()
+
+            job_post = job_form.save(commit=False)
             job_post.owner = request.user
+            job_post.pet = pet
             job_post.save()
-            messages.success(request, "Job post created.")
-            return redirect('job_post_list')
+
+            messages.success(request, "เพิ่มสัตว์เลี้ยงและสร้างงานเรียบร้อยแล้ว")
+            return redirect('/')
+        else:
+            print("=== FORM ERRORS ===")
     else:
-        form = JobPostForm(user=request.user)  # Pass user to filter pets
-    return render(request, 'job_post_create.html', {'form': form})
+        job_form = JobPostForm(user=request.user)
+        pet_form = PetForm()
+
+    return render(request, 'job_post_create.html', {
+        'job_form': job_form,
+        'pet_form': pet_form
+    })
+
+
 
 def job_post_detail(request, pk):
     job_post = get_object_or_404(JobPost, pk=pk)
