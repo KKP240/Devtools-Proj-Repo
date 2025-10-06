@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}แก้ไขข้อมูลการจ้างงาน สัตว์เลี้ยง{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto bg-white p-6 rounded shadow">
+  <h2 class="text-2xl font-semibold mb-6">แก้ไขข้อมูลการจ้างงาน สัตว์เลี้ยง</h2>
+  
+  <!-- แก้ไข: เพิ่ม enctype สำหรับอัปโหลดไฟล์ -->
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    <!-- แสดง error ทั่วไป -->
+    {% if pet_form.non_field_errors %}
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        {{ pet_form.non_field_errors }}
+      </div>
+    {% endif %}
+    {% if job_form.non_field_errors %}
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        {{ job_form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    <div class="space-y-6">
+      <!-- ส่วนข้อมูลสัตว์เลี้ยง -->
+      <div class="border-b pb-4">
+        <h3 class="text-lg font-medium mb-4 text-blue-600">ข้อมูลสัตว์เลี้ยง</h3>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium mb-1">ชื่อสัตว์เลี้ยง</label>
+            {{ pet_form.name }}
+            {% if pet_form.name.errors %}
+              <p class="text-red-500 text-sm mt-1">{{ pet_form.name.errors.0 }}</p>
+            {% endif %}
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium mb-1">ชนิดสัตว์</label>
+            {{ pet_form.species }}
+            {% if pet_form.species.errors %}
+              <p class="text-red-500 text-sm mt-1">{{ pet_form.species.errors.0 }}</p>
+            {% endif %}
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium mb-1">อายุ (ปี)</label>
+            {{ pet_form.age }}
+            {% if pet_form.age.errors %}
+              <p class="text-red-500 text-sm mt-1">{{ pet_form.age.errors.0 }}</p>
+            {% endif %}
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium mb-1">หมายเหตุ/ข้อมูลเพิ่มเติม</label>
+            {{ pet_form.notes }}
+            {% if pet_form.notes.errors %}
+              <p class="text-red-500 text-sm mt-1">{{ pet_form.notes.errors.0 }}</p>
+            {% endif %}
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium mb-1">รูปภาพ</label>
+            {{ pet_form.photo }}
+            {% if pet_form.photo.errors %}
+              <p class="text-red-500 text-sm mt-1">{{ pet_form.photo.errors.0 }}</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- ส่วนข้อมูลงาน -->
+      <div class="border-b pb-4">
+        <h3 class="text-lg font-medium mb-4 text-green-600">รายละเอียดงาน</h3>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium mb-1">หัวข้องาน</label>
+            {{ job_form.title }}
+            {% if job_form.title.errors %}
+              <p class="text-red-500 text-sm mt-1">{{ job_form.title.errors.0 }}</p>
+            {% endif %}
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium mb-1">รายละเอียด</label>
+            {{ job_form.description }}
+            {% if job_form.description.errors %}
+              <p class="text-red-500 text-sm mt-1">{{ job_form.description.errors.0 }}</p>
+            {% endif %}
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium mb-1">วันเริ่มต้น</label>
+              {{ job_form.start }}
+              {% if job_form.start.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ job_form.start.errors.0 }}</p>
+              {% endif %}
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium mb-1">วันสิ้นสุด</label>
+              {{ job_form.end }}
+              {% if job_form.end.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ job_form.end.errors.0 }}</p>
+              {% endif %}
+            </div>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium mb-1">สถานที่</label>
+            {{ job_form.location }}
+            {% if job_form.location.errors %}
+              <p class="text-red-500 text-sm mt-1">{{ job_form.location.errors.0 }}</p>
+            {% endif %}
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium mb-1">งบประมาณ (บาท)</label>
+            {{ job_form.budget }}
+            {% if job_form.budget.errors %}
+              <p class="text-red-500 text-sm mt-1">{{ job_form.budget.errors.0 }}</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- ปุ่มส่งฟอร์ม -->
+      <div class="flex gap-3">
+        <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
+          สร้างงานและเพิ่มสัตว์เลี้ยง
+        </button>
+        <a href="{% url 'home' %}" class="px-6 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition">
+          ยกเลิก
+        </a>
+      </div>
+    </div>
+  </form>
+</div>
+
+<style>
+  input,
+  textarea,
+  select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+  }
+  
+  input[type="text"]:focus,
+  input[type="number"]:focus,
+  input[type="datetime-local"]:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    ring: 2px;
+    ring-color: #3b82f680;
+  }
+  
+  textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+  
+  input[type="file"] {
+    padding: 0.5rem 0;
+  }
+</style>
+{% endblock content %}

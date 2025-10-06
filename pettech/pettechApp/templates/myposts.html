@@ -1,11 +1,38 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Posts{% endblock title %}
-{% block head %}
-  hello my posts
-{% endblock head %}
+{% block title %}Your Posts{% endblock title %}
 
 {% block content %}
-hello my posts
+<div class="max-w-6xl mx-auto my-8 px-4">
+  <h1 class="text-2xl font-semibold mb-6">Your Job Posts</h1>
+  {% if job_posts %}
+    <div class="space-y-4">
+      {% for post in job_posts %}
+        <div class="bg-white shadow rounded-lg p-6">
+          <div class="flex justify-between items-start">
+            <div>
+              <h2 class="text-xl font-semibold">{{ post.title }}</h2>
+              <p class="text-sm text-gray-600">Posted on {{ post.created_at|date:"M d, Y" }}</p>
+            </div>
+            <div class="space-x-2">
+              <a href="{% url 'job_post_edit' post.id %}" class="px-3 py-1.5 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm">Edit</a>
+              <a href="{% url 'job_post_delete' post.id %}" class="px-3 py-1.5 bg-red-500 text-white rounded hover:bg-red-600 text-sm">Delete</a>
+            </div>
+          </div>
+          <p class="mt-4 text-gray-700">{{ post.description|linebreaks }}</p>
+          <p class="mt-2 text-sm text-gray-500">Location: {{ post.location }}</p>
+          <p class="mt-1 text-sm text-gray-500">Status: 
+            {% if post.is_active %}
+              <span class="text-green-600 font-medium">Active</span>
+            {% else %}
+              <span class="text-red-600 font-medium">Closed</span>
+            {% endif %}
+          </p>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>You have not posted any jobs yet. <a href="{% url 'job_post_create' %}" class="text-blue-500 underline">Create a new job post</a>.</p>
+  {% endif %}
 {% endblock content %}

@@ -21,6 +21,8 @@ urlpatterns = [
     # Job Post URLs
     path('job-posts/create/', views.job_post_create, name='job_post_create'),
     path('job-posts/<int:pk>/', views.job_post_detail, name='job_post_detail'),
+    path('job-posts/<int:pk>/edit/', views.job_post_edit, name='job_post_edit'),
+    path('job-posts/<int:pk>/delete/', views.job_post_delete, name='job_post_delete'),
 
     # Proposal URLs
     path('job-posts/<int:job_post_id>/propose/', views.proposal_submit, name='proposal_submit'),

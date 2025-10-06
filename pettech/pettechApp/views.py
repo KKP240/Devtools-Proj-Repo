@@ -287,3 +287,41 @@ def edit_profile(request):
         'caregiver_form': caregiver_form,
         'caregiver_profile': caregiver_profile,
     })
+
+@login_required
+def job_post_edit(request, pk):
+    job_post = get_object_or_404(JobPost, pk=pk, owner=request.user)
+    pet = job_post.pet
+
+    if request.method == 'POST':
+        job_form = JobPostForm(request.POST, instance=job_post, user=request.user)
+        pet_form = PetForm(request.POST, request.FILES, instance=pet)
+
+        if job_form.is_valid() and pet_form.is_valid():
+            pet_form.save()
+            job_form.save()
+            messages.success(request, "อัปเดตโพสต์งานเรียบร้อยแล้ว")
+            return redirect('myposts')
+        else:
+            print("DEBUG job_post_edit errors:", job_form.errors, pet_form.errors)
+            messages.error(request, "มีข้อผิดพลาด: ดูคอนโซลเซิร์ฟเวอร์สำหรับรายละเอียด")
+    else:
+        job_form = JobPostForm(instance=job_post, user=request.user)
+        pet_form = PetForm(instance=pet)
+
+    return render(request, 'job_post_edit.html', {
+        'job_form': job_form,
+        'pet_form': pet_form,
+        'job_post': job_post,
+    })
+
+@login_required
+def job_post_delete(request, pk):
+    job_post = get_object_or_404(JobPost, pk=pk, owner=request.user)
+
+    if request.method == 'POST':
+        job_post.delete()
+        messages.success(request, "ลบโพสต์งานเรียบร้อยแล้ว")
+        return redirect('myposts')
+
+    return render(request, 'job_post_delete_confirm.html', {'job_post': job_post})
