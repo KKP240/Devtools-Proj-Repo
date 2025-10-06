@@ -182,7 +182,19 @@ def write_review(request, booking_id):
 
 @login_required
 def myprofile(request):
-    return render(request, 'myprofile.html')
+    user = request.user
+    pets = user.pets.all() 
+
+    caregiver_profile = None
+    if hasattr(user, 'caregiver_profile'):
+        caregiver_profile = user.caregiver_profile
+
+    context = {
+        'user': user,
+        'pets': pets,
+        'caregiver_profile': caregiver_profile,
+    }
+    return render(request, 'myprofile.html', context)
 
 def register(request):
     if request.method == 'POST':
@@ -238,3 +250,40 @@ def caregiver_register(request):
         form = CaregiverProfileForm()
 
     return render(request, 'caregiver_register.html', {'form': form})
+
+@login_required
+def edit_profile(request):
+    user = request.user
+    try:
+        caregiver_profile = user.caregiver_profile
+    except CaregiverProfile.DoesNotExist:
+        caregiver_profile = None
+
+    if request.method == 'POST':
+        pet_form = PetForm(request.POST, request.FILES)
+        caregiver_form = CaregiverProfileForm(request.POST, instance=caregiver_profile)
+
+        if pet_form.is_valid() and caregiver_form.is_valid():
+            if pet_form.cleaned_data.get('name'):
+                pet = pet_form.save(commit=False)
+                pet.owner = user
+                pet.save()
+                messages.success(request, "เพิ่มสัตว์เลี้ยงเรียบร้อยแล้ว")
+
+            caregiver_profile = caregiver_form.save(commit=False)
+            caregiver_profile.user = user
+            caregiver_profile.save()
+            messages.success(request, "อัปเดตโปรไฟล์เรียบร้อยแล้ว")
+            return redirect('myprofile')
+        else:
+            print("DEBUG edit_profile errors:", pet_form.errors, caregiver_form.errors)
+            messages.error(request, "มีข้อผิดพลาด: ดูคอนโซลเซิร์ฟเวอร์สำหรับรายละเอียด")
+    else:
+        pet_form = PetForm()
+        caregiver_form = CaregiverProfileForm(instance=caregiver_profile)
+
+    return render(request, 'edit_profile.html', {
+        'pet_form': pet_form,
+        'caregiver_form': caregiver_form,
+        'caregiver_profile': caregiver_profile,
+    })

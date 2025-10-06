@@ -32,6 +32,7 @@ urlpatterns = [
 
     # User Profile URLs
     path('myprofile/', views.myprofile, name='myprofile'),
+    path('myprofile/edit/', views.edit_profile, name='edit_profile'),
     path('booking-history/', views.my_booking_history, name='booking_history'),
     path('myposts/', views.myposts, name='myposts'),
     path('write_review/<int:booking_id>/', views.write_review, name='write_review'),
