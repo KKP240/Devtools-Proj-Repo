@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.contrib.auth.forms import AuthenticationForm
 from django.views import View
-
+from django.db import models
 from .models import CaregiverProfile, Pet, Booking, Review, JobPost, Proposal
 from .forms import (
     RegisterForm, LoginForm, PetForm, CaregiverProfileForm,
@@ -126,22 +126,29 @@ def proposal_accept(request, job_post_id, proposal_id):
     if job_post.status != 'open':
         messages.error(request, "This job post is no longer open.")
         return redirect('job_post_detail', pk=job_post_id)
-    booking = Booking.objects.create(
-        owner=job_post.owner,
-        caregiver=proposal.caregiver,
-        pet=job_post.pet,
-        start=job_post.start,
-        end=job_post.end,
-        status='P',
-        proposal=proposal
-    )
-    proposal.status = 'accepted'
-    proposal.save()
-    job_post.status = 'assigned'
-    job_post.save()
-    Proposal.objects.filter(job_post=job_post).exclude(id=proposal_id).update(status='rejected')
-    messages.success(request, "Proposal accepted and booking created.")
-    return redirect('booking_detail')
+
+    if request.method == 'POST':
+        # Use valid booking status, e.g. 'C'
+        booking = Booking.objects.create(
+            owner=job_post.owner,
+            caregiver=proposal.caregiver,
+            pet=job_post.pet,
+            start=job_post.start,
+            end=job_post.end,
+            status='accepted',  # confirmed
+            proposal=proposal
+        )
+        proposal.status = 'accepted'
+        proposal.save()
+        job_post.status = 'assigned'
+        job_post.save()
+        # Reject others
+        Proposal.objects.filter(job_post=job_post).exclude(id=proposal_id).update(status='rejected')
+        messages.success(request, "Proposal accepted and booking created.")
+        return redirect('booking_list')
+    else:
+        messages.error(request, "Invalid request method.")
+        return redirect('job_post_detail', pk=job_post_id)
 
 @login_required
 def myposts(request):
@@ -149,23 +156,48 @@ def myposts(request):
     return render(request, 'myposts.html', {'job_posts': job_posts})
 
 @login_required
-def booking_detail(request):
-    bookings = Booking.objects.filter(owner=request.user).select_related('caregiver', 'pet')
-    return render(request, 'booking_detail.html', {'bookings': bookings})
+def booking_list(request):
+    owner_bookings = Booking.objects.filter(owner=request.user).select_related('caregiver', 'pet', 'proposal')
+    caregiver_bookings = Booking.objects.filter(caregiver=request.user).select_related('owner', 'pet', 'proposal')
+
+    return render(request, 'booking_list.html', {
+        'owner_bookings': owner_bookings,
+        'caregiver_bookings': caregiver_bookings,
+    })
+
+@login_required
+def booking_complete(request, booking_id):
+    booking = get_object_or_404(Booking, pk=booking_id)
+
+    if request.user != booking.owner and request.user != booking.caregiver:
+        messages.error(request, "You cannot complete this booking.")
+        return redirect('booking_list')
+
+    if booking.status != 'C':
+        messages.error(request, "This booking is not confirmed.")
+        return redirect('booking_list')
+
+    booking.status = 'D'
+    booking.save()
+    messages.success(request, "Booking marked as completed.")
+    return redirect('booking_list')
 
 @login_required
 def my_booking_history(request):
-    bookings = Booking.objects.filter(owner=request.user).select_related('caregiver', 'pet')
+    # Get bookings where user is either owner or caregiver
+    bookings = Booking.objects.filter(
+        models.Q(owner=request.user) | models.Q(caregiver=request.user)
+    ).select_related('proposal__job_post', 'caregiver', 'owner', 'pet').order_by('-start')
+    
     return render(request, 'booking_history.html', {'bookings': bookings})
 
 @login_required
 def write_review(request, booking_id):
     booking = get_object_or_404(Booking, pk=booking_id, owner=request.user, status='D')
+    # status 'D' means done/completed
     if hasattr(booking, 'review'):
         messages.error(request, "You have already reviewed this booking.")
         return redirect('booking_history')
-    if request.method == 'GET':
-        form = ReviewForm()
 
     if request.method == 'POST':
         form = ReviewForm(request.POST)
@@ -325,3 +357,8 @@ def job_post_delete(request, pk):
         return redirect('myposts')
 
     return render(request, 'job_post_delete_confirm.html', {'job_post': job_post})
+
+@login_required
+def my_proposals(request):
+    proposals = Proposal.objects.filter(caregiver=request.user).select_related('job_post')
+    return render(request, 'my_proposals.html', {'proposals': proposals})

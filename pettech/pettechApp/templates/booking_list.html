@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Bookings{% endblock %}
+{% block content %}
+<h3 class="text-xl font-semibold mt-4 mb-2">Bookings As Owner</h3>
+{% if owner_bookings %}
+  {% for booking in owner_bookings %}
+    <div class="bg-white p-4 shadow rounded mb-4">
+      <p><strong>Job:</strong> {{ booking.proposal.job_post.title }}</p>
+      <p><strong>Pet:</strong> {{ booking.pet.name }}</p>
+      <p><strong>Caregiver:</strong> {{ booking.caregiver.username }}</p>
+      <p><strong>Status:</strong> {{ booking.get_status_display }}</p>
+    </div>
+  {% endfor %}
+{% else %}
+  <p>No bookings as owner.</p>
+{% endif %}
+
+<h3 class="text-xl font-semibold mt-6 mb-2">Bookings As Caregiver</h3>
+{% if caregiver_bookings %}
+  {% for booking in caregiver_bookings %}
+    <div class="bg-white p-4 shadow rounded mb-4">
+      <p><strong>Job:</strong> {{ booking.proposal.job_post.title }}</p>
+      <p><strong>Pet:</strong> {{ booking.pet.name }}</p>
+      <p><strong>Owner:</strong> {{ booking.owner.username }}</p>
+      <p><strong>Status:</strong> {{ booking.get_status_display }}</p>
+
+      {% if user == booking.caregiver and booking.status == 'C' %}
+        <form method="post" action="{% url 'booking_complete' booking.id %}">
+          {% csrf_token %}
+          <button class="bg-green-500 text-white px-4 py-2 mt-2 rounded">Mark as Complete</button>
+        </form>
+      {% endif %}
+    </div>
+  {% endfor %}
+{% else %}
+  <p>No bookings as caregiver.</p>
+{% endif %}
+{% endblock %}

@@ -25,11 +25,13 @@ urlpatterns = [
     path('job-posts/<int:pk>/delete/', views.job_post_delete, name='job_post_delete'),
 
     # Proposal URLs
+    path('myproposals/', views.my_proposals, name='my_proposals'),
     path('job-posts/<int:job_post_id>/propose/', views.proposal_submit, name='proposal_submit'),
     path('job-posts/<int:job_post_id>/proposals/<int:proposal_id>/accept/', views.proposal_accept, name='proposal_accept'),
 
     # Booking URLs
-    path('bookings/', views.booking_detail, name='booking_detail'),
+    path('bookings/', views.booking_list, name='booking_list'),
+    path('bookings/<int:booking_id>/complete/', views.booking_complete, name='booking_complete'), # for caregiver to mark as done
     #path('bookings/<int:booking_id>/review/', views.review_create, name='review_create'),
 
     # User Profile URLs
