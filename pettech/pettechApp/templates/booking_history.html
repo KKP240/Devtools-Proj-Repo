@@ -28,7 +28,7 @@
           <tr class="border-b border-gray-200 hover:bg-gray-50">
             <td class="p-4 text-sm text-gray-700">{{ booking.id }}</td>
             <td class="p-4 text-sm text-gray-700">
-              <a href="{% url 'job_post_detail' booking.proposal.job_post.id %}" class="text-blue-600 hover:underline">
+              <a href="{% url 'job_post_detail' booking.proposal.job_post.id %}" class="text-green-600 font-semibold hover:underline">
                 {{ booking.proposal.job_post.title }}
               </a>
             </td>
@@ -54,7 +54,7 @@
               {% if not booking.review %}
                 <form id="reviewForm-{{ booking.id }}" method="post" action="{% url 'write_review' booking.id %}">
                   {% csrf_token %}
-                  <button type="submit" class="text-blue-600 hover:underline">Write a Review</button>
+                  <button type="submit" class="text-green-600 font-semibold hover:underline">Write a Review</button>
                 </form>
               {% else %}
                 <span class="text-green-600 text-sm">Reviewed</span>

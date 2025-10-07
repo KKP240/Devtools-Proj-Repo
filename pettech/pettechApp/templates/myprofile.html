@@ -37,8 +37,8 @@
             <p class="mt-1 text-sm opacity-90">Pet Lover • Customer</p>
           {% endif %}
           <div class="mt-3 flex flex-wrap gap-2">
-            <a href="{% url 'edit_profile' %}" class="inline-flex items-center px-3 py-1.5 bg-white/20 hover:bg-white/25 rounded text-sm">Edit profile</a>
-            <a href="{% url 'logout' %}" class="inline-flex items-center px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded text-sm">Sign out</a>
+            <a href="{% url 'edit_profile' %}" class="inline-flex items-center px-3 py-1.5 bg-gray-600 text-white hover:bg-gray-700 rounded text-sm">Edit profile</a>
+            <a href="{% url 'logout' %}" class="inline-flex items-center px-3 py-1.5 bg-red-600 text-white hover:bg-red-700 transition-all rounded text-sm">Sign out</a>
             
         </div>
       </div>
@@ -108,7 +108,7 @@
           {% endif %}
 
           <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="p-4 bg-gray-50 rounded">
+            <div class="p-4 bg-gray-200 rounded">
               <h4 class="text-xs text-gray-500">Pets</h4>
               {% if pets and pets.exists %}
                 <ul class="mt-2 space-y-2">
