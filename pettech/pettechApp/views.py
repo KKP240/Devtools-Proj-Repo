@@ -135,7 +135,7 @@ def proposal_accept(request, job_post_id, proposal_id):
             pet=job_post.pet,
             start=job_post.start,
             end=job_post.end,
-            status='accepted',  # confirmed
+            status='C',  # confirmed
             proposal=proposal
         )
         proposal.status = 'accepted'
