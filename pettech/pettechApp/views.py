@@ -225,6 +225,7 @@ def myprofile(request):
         'user': user,
         'pets': pets,
         'caregiver_profile': caregiver_profile,
+        'booking': Booking.objects.filter(caregiver = request.user)
     }
     return render(request, 'myprofile.html', context)
 

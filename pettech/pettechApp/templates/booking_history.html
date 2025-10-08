@@ -51,13 +51,16 @@
               {% endif %}
             </td>
             <td class="p-4 text-sm text-gray-700">
-              {% if not booking.review %}
-                <form id="reviewForm-{{ booking.id }}" method="post" action="{% url 'write_review' booking.id %}">
-                  {% csrf_token %}
-                  <button type="submit" class="text-green-600 font-semibold hover:underline">Write a Review</button>
-                </form>
-              {% else %}
-                <span class="text-green-600 text-sm">Reviewed</span>
+              {% if booking.status == 'D' and not booking.caregiver == user %}
+                {% if not booking.review %}
+                  <a href="{% url 'write_review' booking.id %}" class="text-green-600 font-semibold hover:text-green-700 transition-all">Write a Review</a>
+                  <!-- <form id="reviewForm-{{ booking.id }}" method="get" action="{% url 'write_review' booking.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="text-green-600 font-semibold hover:text-green-700 transition-all">Write a Review</button>
+                  </form> -->
+                {% else %}
+                  <span class="text-green-600 text-sm">Reviewed</span>
+                {% endif %}
               {% endif %}
             </td>
           </tr>
