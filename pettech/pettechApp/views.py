@@ -12,6 +12,7 @@ from .forms import (
     RegisterForm, LoginForm, PetForm, CaregiverProfileForm,
     BookingForm, ReviewForm, JobPostForm, ProposalForm
 )
+from django.db.models import Count
 
 def home(request):
     search_query = request.GET.get('search', '')
@@ -225,7 +226,7 @@ def myprofile(request):
         'user': user,
         'pets': pets,
         'caregiver_profile': caregiver_profile,
-        'booking': Booking.objects.filter(caregiver = request.user)
+        'booking': Booking.objects.annotate(count_review = Count('review')).filter(caregiver = request.user, count_review__gte = 1)
     }
     return render(request, 'myprofile.html', context)
 
