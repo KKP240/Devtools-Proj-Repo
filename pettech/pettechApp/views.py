@@ -8,6 +8,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.views import View
 from django.db import models
 from .models import CaregiverProfile, Pet, Booking, Review, JobPost, Proposal
+from django.db.models import Q
+
 from .forms import (
     RegisterForm, LoginForm, PetForm, CaregiverProfileForm,
     BookingForm, ReviewForm, JobPostForm, ProposalForm
@@ -366,7 +368,11 @@ def job_post_delete(request, pk):
 
 @login_required
 def my_proposals(request):
-    proposals = Proposal.objects.filter(caregiver=request.user).select_related('job_post')
+    user = request.user
+    proposals = Proposal.objects.select_related('job_post__owner', 'caregiver') \
+        .filter(Q(caregiver=user) | Q(job_post__owner=user)) \
+        .order_by('-created_at')
+
     return render(request, 'my_proposals.html', {'proposals': proposals})
 
 @login_required
