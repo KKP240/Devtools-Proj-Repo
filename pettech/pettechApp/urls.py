@@ -42,6 +42,12 @@ urlpatterns = [
     path('myposts/', views.myposts, name='myposts'),
     path('write_review/<int:booking_id>/', views.write_review, name='write_review'),
 
+    # Caregiver Profile
+    path('caregiver-profile/<int:pk>/', views.caregiver_profile, name='caregiver_profile'),
+
+    # User Profile
+    #path('user/<int:pk>/', views.user_profile, name='user_profile'),
+
     # Authentication URLs
     path("login/", views.LoginView.as_view(), name="login"),
     path("logout/", views.LogoutView.as_view(), name="logout"),

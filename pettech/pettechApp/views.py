@@ -213,23 +213,6 @@ def write_review(request, booking_id):
 
     return render(request, 'write_review.html', {'form': form, 'booking': booking})
 
-@login_required
-def myprofile(request):
-    user = request.user
-    pets = user.pets.all() 
-
-    caregiver_profile = None
-    if hasattr(user, 'caregiver_profile'):
-        caregiver_profile = user.caregiver_profile
-
-    context = {
-        'user': user,
-        'pets': pets,
-        'caregiver_profile': caregiver_profile,
-        'booking': Booking.objects.annotate(count_review = Count('review')).filter(caregiver = request.user, count_review__gte = 1)
-    }
-    return render(request, 'myprofile.html', context)
-
 def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
@@ -403,3 +386,39 @@ def caregiver_edit(request, pk):
         form = CaregiverProfileForm(instance=caregiver_profile)
 
     return render(request, 'caregiver_edit.html', {'form': form})
+
+def caregiver_profile(request, pk):
+    caregiver = get_object_or_404(CaregiverProfile, pk=pk)
+    user = caregiver.user
+    reviews = Review.objects.filter(booking__caregiver=user).select_related('booking')
+
+    pets = user.pets.all()
+
+    booking = Booking.objects.annotate(
+        count_review=Count('review')
+    ).filter(caregiver=user, count_review__gte=1)
+
+    return render(request, 'caregiver_profile.html', {
+        'user': user,
+        'pets': pets,
+        'caregiver_profile': caregiver,
+        'booking': booking,
+        'is_self': request.user == user,
+    })
+
+@login_required
+def myprofile(request):
+    user = request.user
+    pets = user.pets.all() 
+
+    caregiver_profile = None
+    if hasattr(user, 'caregiver_profile'):
+        caregiver_profile = user.caregiver_profile
+
+    context = {
+        'user': user,
+        'pets': pets,
+        'caregiver_profile': caregiver_profile,
+        'booking': Booking.objects.annotate(count_review = Count('review')).filter(caregiver = request.user, count_review__gte = 1)
+    }
+    return render(request, 'myprofile.html', context)
