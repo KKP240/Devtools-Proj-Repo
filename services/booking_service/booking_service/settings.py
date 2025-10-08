@@ -53,7 +53,7 @@ DATABASES = {
         'NAME': os.getenv('DB_NAME', 'bookings_db'),
         'USER': os.getenv('DB_USER', 'postgres'),
         'PASSWORD': os.getenv('DB_PASSWORD', 'password'),
-        # 'HOST': os.getenv('DB_HOST', 'db'),
+        'HOST': os.getenv('DB_HOST'),
         'PORT': int(os.getenv('DB_PORT', '5432')),
     }
 }
