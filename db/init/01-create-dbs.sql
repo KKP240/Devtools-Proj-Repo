@@ -1,0 +1,3 @@
+CREATE DATABASE users_db;
+CREATE DATABASE pets_db;
+CREATE DATABASE bookings_db;

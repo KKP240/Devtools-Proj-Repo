@@ -1,21 +1,82 @@
 version: '3.8'
 services:
-  web:
-    build: .
-    command: gunicorn pettech.wsgi:application --bind 0.0.0.0:8000
+  # Monolith (optional): keep for reference; prefer new microservices below
+  # web:
+  #   build: .
+  #   command: gunicorn pettech.wsgi:application --bind 0.0.0.0:8000
+  #   ports:
+  #     - "8000:8000"
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - db
+
+  user_service:
+    build:
+      context: ./services/user_service
+    command: sh -c "python manage.py migrate && gunicorn user_service.wsgi:application --bind 0.0.0.0:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=user_service.settings
+      - DB_NAME=users_db
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_HOST=db
+      - DB_PORT=5432
+      - SHARED_JWT_SECRET=${SHARED_JWT_SECRET:-dev-shared-jwt-secret}
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-dev-django-secret}
+      - DEBUG=1
     ports:
-      - "8000:8000"
-    env_file:
-      - .env
+      - "8001:8000"
     depends_on:
       - db
+
+  pet_service:
+    build:
+      context: ./services/pet_service
+    command: sh -c "python manage.py makemigrations --noinput && python manage.py migrate --noinput && gunicorn pet_service.wsgi:application --bind 0.0.0.0:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=pet_service.settings
+      - DB_NAME=pets_db
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_HOST=db
+      - DB_PORT=5432
+      - SHARED_JWT_SECRET=${SHARED_JWT_SECRET:-dev-shared-jwt-secret}
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-dev-django-secret}
+      - DEBUG=1
+    ports:
+      - "8002:8000"
+    depends_on:
+      - db
+
+  booking_service:
+    build:
+      context: ./services/booking_service
+    command: sh -c "python manage.py makemigrations --noinput && python manage.py migrate --noinput && gunicorn booking_service.wsgi:application --bind 0.0.0.0:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=booking_service.settings
+      - DB_NAME=bookings_db
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_HOST=db
+      - DB_PORT=5432
+      - SHARED_JWT_SECRET=${SHARED_JWT_SECRET:-dev-shared-jwt-secret}
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-dev-django-secret}
+      - DEBUG=1
+    ports:
+      - "8003:8000"
+    depends_on:
+      - db
+
   db:
     image: postgres:15
     environment:
-      POSTGRES_DB: pettech
-      POSTGRES_USER: pettech
-      POSTGRES_PASSWORD: changeme
+      POSTGRES_DB: template1
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d
+
 volumes:
   pgdata:
