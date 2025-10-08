@@ -283,41 +283,62 @@ def caregiver_register(request):
 
     return render(request, 'caregiver_register.html', {'form': form})
 
+
 @login_required
 def edit_profile(request):
     user = request.user
-    try:
-        caregiver_profile = user.caregiver_profile
-    except CaregiverProfile.DoesNotExist:
-        caregiver_profile = None
 
     if request.method == 'POST':
+        updated = False
+        
+        # Update username and email
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        
+        # Validate username uniqueness
+        if username and username != user.username:
+            from django.contrib.auth.models import User
+            if User.objects.filter(username=username).exists():
+                messages.error(request, "Username already exists")
+            else:
+                user.username = username
+                updated = True
+        
+        # Validate email
+        if email and email != user.email:
+            user.email = email
+            updated = True
+        
+        # Save user changes if any
+        if updated:
+            try:
+                user.save()
+                messages.success(request, "Profile updated successfully")
+            except Exception as e:
+                messages.error(request, f"Error updating profile: {str(e)}")
+        
+        # Handle pet form
         pet_form = PetForm(request.POST, request.FILES)
-        caregiver_form = CaregiverProfileForm(request.POST, instance=caregiver_profile)
-
-        if pet_form.is_valid() and caregiver_form.is_valid():
+        if pet_form.is_valid():
+            # Add new pet if form has data
             if pet_form.cleaned_data.get('name'):
                 pet = pet_form.save(commit=False)
                 pet.owner = user
                 pet.save()
-                messages.success(request, "เพิ่มสัตว์เลี้ยงเรียบร้อยแล้ว")
-
-            caregiver_profile = caregiver_form.save(commit=False)
-            caregiver_profile.user = user
-            caregiver_profile.save()
-            messages.success(request, "อัปเดตโปรไฟล์เรียบร้อยแล้ว")
-            return redirect('myprofile')
+                messages.success(request, "Pet added successfully")
         else:
-            print("DEBUG edit_profile errors:", pet_form.errors, caregiver_form.errors)
-            messages.error(request, "มีข้อผิดพลาด: ดูคอนโซลเซิร์ฟเวอร์สำหรับรายละเอียด")
+            if pet_form.errors:
+                for field, errors in pet_form.errors.items():
+                    for error in errors:
+                        messages.error(request, f"{field}: {error}")
+        
+        # Redirect after POST (always redirect after successful POST)
+        return redirect('myprofile')
     else:
         pet_form = PetForm()
-        caregiver_form = CaregiverProfileForm(instance=caregiver_profile)
 
     return render(request, 'edit_profile.html', {
         'pet_form': pet_form,
-        'caregiver_form': caregiver_form,
-        'caregiver_profile': caregiver_profile,
     })
 
 @login_required
@@ -362,3 +383,21 @@ def job_post_delete(request, pk):
 def my_proposals(request):
     proposals = Proposal.objects.filter(caregiver=request.user).select_related('job_post')
     return render(request, 'my_proposals.html', {'proposals': proposals})
+
+@login_required
+def caregiver_edit(request, pk):
+    caregiver_profile = get_object_or_404(CaregiverProfile, pk=pk, user=request.user)
+
+    if request.method == 'POST':
+        form = CaregiverProfileForm(request.POST, instance=caregiver_profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Caregiver profile updated successfully.")
+            return redirect('myprofile')
+        else:
+            print("DEBUG caregiver_edit errors:", form.errors)  # debug
+            messages.error(request, "มีข้อผิดพลาด: ดูคอนโซลเซิร์ฟเวอร์สำหรับรายละเอียด")
+    else:
+        form = CaregiverProfileForm(instance=caregiver_profile)
+
+    return render(request, 'caregiver_edit.html', {'form': form})

@@ -5,7 +5,10 @@
 
 {% block content %}
 <div class="max-w-6xl mx-auto my-8 px-4">
-  <h1 class="text-2xl font-semibold mb-6">Your Job Posts</h1>
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-semibold">Your Job Posts</h1>
+    <a href="{% url 'job_post_create' %}" class="px-4 py-2 text-white bg-green-500 shadow rounded-md hover:bg-green-600 font-medium transition-colors">Create a new job post</a>
+  </div>
   {% if job_posts %}
     <div class="space-y-4">
       {% for post in job_posts %}
@@ -33,6 +36,6 @@
       {% endfor %}
     </div>
   {% else %}
-    <p>You have not posted any jobs yet. <a href="{% url 'job_post_create' %}" class="text-blue-500 underline">Create a new job post</a>.</p>
+    <p>You have not posted any jobs yet Create a new job post.</p>
   {% endif %}
 {% endblock content %}
