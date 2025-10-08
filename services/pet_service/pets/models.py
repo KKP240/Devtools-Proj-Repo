@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.auth.models import User
 
 class Pet(models.Model):
     owner_id = models.IntegerField()  # store user id from user_service
