@@ -37,7 +37,9 @@
         <ul class="space-y-4">
           {% for proposal in proposals %}
             <li class="border p-4 rounded {% if proposal.status == 'accepted' %}bg-green-50{% elif proposal.status == 'rejected' %}bg-gray-50{% endif %}">
-              <p class="text-gray-800"><strong>ผู้ดูแล:</strong> {{ proposal.caregiver.username }}</p>
+              <p class="text-gray-800"><strong>ผู้ดูแล:</strong> <a class="text-green-700" href="{% url 'caregiver_profile' proposal.caregiver.id %}">
+          {{ proposal.caregiver.username }}
+        </a></p>
               <p class="text-gray-800"><strong>ข้อความ:</strong> {{ proposal.message }}</p>
               <p class="text-gray-800"><strong>อัตราที่เสนอ:</strong> ฿{{ proposal.proposed_rate }}</p>
               <p class="text-gray-800"><strong>วันที่ส่ง:</strong> {{ proposal.created_at|date:"d M Y H:i" }}</p>
