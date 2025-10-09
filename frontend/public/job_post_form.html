@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Job Post Form - PetTech</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+
+    <div include-html="/templates/nav.html"></div>
+  
+    <main class="py-10 max-w-3xl mx-auto px-4">
+        <div class="bg-white p-6 rounded shadow">
+            <h2 id="form-title" class="text-2xl font-semibold mb-6">Create a New Job Post</h2>
+            <form id="job-post-form" class="space-y-6">
+                <div id="form-message" class="hidden"></div>
+                <fieldset class="border-b pb-4">
+                    <legend class="text-lg font-medium mb-4 text-green-600">Pet Information</legend>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="pet-name" class="block text-sm font-medium">Pet's Name</label>
+                            <input type="text" id="pet-name" name="pet_name" required class="mt-1 border rounded-md w-full px-3 py-2">
+                        </div>
+                        <div>
+                            <label for="pet-species" class="block text-sm font-medium">Species</label>
+                            <input type="text" id="pet-species" name="pet_species" required class="mt-1 border rounded-md w-full px-3 py-2">
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <legend class="text-lg font-medium mb-4 text-green-600">Job Information</legend>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="job-title" class="block text-sm font-medium">Job Title</label>
+                            <input type="text" id="job-title" name="job_title" required class="mt-1 border rounded-md w-full px-3 py-2">
+                        </div>
+                        <div>
+                            <label for="job-description" class="block text-sm font-medium">Description</label>
+                            <textarea id="job-description" name="job_description" rows="4" required class="mt-1 border rounded-md w-full px-3 py-2"></textarea>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="job-start" class="block text-sm font-medium">Start Time</label>
+                                <input type="datetime-local" id="job-start" name="job_start" required class="mt-1 border rounded-md w-full px-3 py-2">
+                            </div>
+                            <div>
+                                <label for="job-end" class="block text-sm font-medium">End Time</label>
+                                <input type="datetime-local" id="job-end" name="job_end" required class="mt-1 border rounded-md w-full px-3 py-2">
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <div class="flex gap-3">
+                    <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700">Submit Post</button>
+                    <a href="/" class="px-6 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </main>
+    
+    <script src="/js/main.js"></script>
+    <script src="/js/include.js"></script>
+    </body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Job Details - PetTech</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+
+    <div include-html="/includes/nav.html"></div>
+
+    <main class="py-10 max-w-3xl mx-auto px-4 space-y-6">
+        <div id="job-detail-container" class="bg-white p-6 rounded shadow relative">
+            <p>Loading job details...</p>
+        </div>
+        <div id="proposals-section" class="bg-white p-6 rounded shadow">
+            <h3 class="text-xl font-semibold mb-4">Proposals for this Job</h3>
+            <p>Loading proposals...</p>
+        </div>
+        <div id="proposal-form-section" class="bg-gray-50 p-6 rounded shadow">
+            <h3 class="text-xl font-semibold mb-4">Submit a Proposal</h3>
+            <form id="proposal-form">
+                <div class="space-y-4">
+                    <div>
+                        <label for="message" class="block font-semibold">Message</label>
+                        <textarea id="message" name="message" rows="3" required class="mt-1 border rounded w-full px-2 py-1"></textarea>
+                    </div>
+                    <div>
+                        <label for="proposed_rate" class="block font-semibold">Your Proposed Rate (฿)</label>
+                        <input type="number" id="proposed_rate" name="proposed_rate" step="0.01" required class="mt-1 border rounded w-full px-2 py-1">
+                    </div>
+                </div>
+                <button type="submit" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Submit Proposal</button>
+                <p id="proposal-form-message" class="mt-2 text-sm"></p>
+            </form>
+        </div>
+    </main>
+    
+    <script src="/js/main.js"></script>
+    <script src="/js/include.js"></script>
+    <script src="/js/job_post_detail.js"></script>
+</body>
+</html>

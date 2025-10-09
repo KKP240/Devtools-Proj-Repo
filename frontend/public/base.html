@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PetTech</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen">
+
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-8">
+                    <a href="/" class="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">PetTech</a>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div id="nav-guest-links" class="flex items-center gap-2 text-sm">
+                        <a href="/login.html" class="px-4 py-2 text-green-600 hover:text-green-700 font-medium">Login</a>
+                        <a href="/register.html" class="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-medium shadow-sm hover:shadow">Register</a>
+                    </div>
+                    <div id="nav-user-links" class="hidden relative">
+                        <button id="user-menu-button" class="flex items-center gap-2 text-sm rounded-lg hover:bg-gray-50 px-3 py-2">
+                            <span id="nav-username" class="font-medium"></span>
+                        </button>
+                        <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
+                            <a href="/myprofile.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Profile</a>
+                            <a href="/myposts.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Job Posts</a>
+                            <a href="/my_proposals.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Proposals</a>
+                            <a href="/my_bookings.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Bookings</a>
+                            <button id="logout-button" class="block w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-gray-100">Logout</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main class="py-10">
+        <div id="page-content" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            </div>
+    </main>
+    
+    <script src="/js/main.js"></script>
+</body>
+</html>

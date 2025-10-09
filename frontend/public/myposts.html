@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Job Posts - PetTech</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+
+    <div include-html="/templates/nav.html"></div>
+
+    <main class="py-10 max-w-6xl mx-auto px-4">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl font-semibold">Your Job Posts</h1>
+            <a href="/job_post_form.html" class="px-4 py-2 text-white bg-green-500 rounded-md">Create a new job post</a>
+        </div>
+        <div id="my-posts-container" class="space-y-4"><p>Loading your posts...</p></div>
+    </main>
+    
+    <script src="/js/main.js"></script>
+    <script src="/js/include.js"></script>
+    <script src="/js/myposts.js"></script> </body>
+</html>

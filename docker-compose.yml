@@ -11,25 +11,44 @@ services:
   #   depends_on:
   #     - db
 
-  users_db:
+  frontend:
+    image: nginx:alpine
+    ports:
+      - "80:80" # ทำให้เราเข้าเว็บได้ทาง http://localhost/
+    volumes:
+      - ./frontend/public:/usr/share/nginx/html # <-- แก้ไข: Map โฟลเดอร์ public ของคุณเข้าไป
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf # <-- แก้ไข path ตรงนี้
+
+    depends_on:
+      - user-service
+      - pet-service
+      - booking-service
+      - job-post-service
+      - proposal-service
+    restart: unless-stopped
+
+
+  users-db:
     image: postgres:16-alpine
     volumes:
-      - user_postgres_data:/var/lib/postgresql/data/
+      - user-postgres-data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=users_db
+      - POSTGRES_DB=users-db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
 
-  user_service:
+  user-service:
     build:
-      context: ./services/user_service
-    command: sh -c "python manage.py makemigrations users --noinput && python manage.py migrate && gunicorn user_service.wsgi:application --bind 0.0.0.0:8000"
+      context: ./services/user-service
+    command: sh -c "python manage.py migrate --noinput && gunicorn user-service.wsgi:application --bind 0.0.0.0:8000"
+    
+
     environment:
-      - DJANGO_SETTINGS_MODULE=user_service.settings
-      - DB_NAME=users_db
+      - DJANGO_SETTINGS_MODULE=user-service.settings
+      - DB_NAME=users-db
       - DB_USER=postgres
       - DB_PASSWORD=password
-      - DB_HOST=users_db
+      - DB_HOST=users-db
       - DB_PORT=5432
       - SHARED_JWT_SECRET=${SHARED_JWT_SECRET:-dev-shared-jwt-secret}
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-dev-django-secret}
@@ -37,29 +56,30 @@ services:
     ports:
       - "8001:8000"
     depends_on:
-      - users_db
+      - users-db
     restart: unless-stopped
     
 
-  pets_db:
+  pets-db:
     image: postgres:16-alpine
     volumes:
-      - pet_postgres_data:/var/lib/postgresql/data/
+      - pet-postgres-data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=pets_db
+      - POSTGRES_DB=pets-db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
 
-  pet_service:
+  pet-service:
     build:
-      context: ./services/pet_service
-    command: sh -c "python manage.py makemigrations pets --noinput && python manage.py migrate --noinput && gunicorn pet_service.wsgi:application --bind 0.0.0.0:8000"
+      context: ./services/pet-service
+    command: sh -c "python manage.py migrate --noinput && gunicorn pet-service.wsgi:application --bind 0.0.0.0:8000"
+
     environment:
-      - DJANGO_SETTINGS_MODULE=pet_service.settings
-      - DB_NAME=pets_db
+      - DJANGO_SETTINGS_MODULE=pet-service.settings
+      - DB_NAME=pets-db
       - DB_USER=postgres
       - DB_PASSWORD=password
-      - DB_HOST=pets_db
+      - DB_HOST=pets-db
       - DB_PORT=5432
       - SHARED_JWT_SECRET=${SHARED_JWT_SECRET:-dev-shared-jwt-secret}
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-dev-django-secret}
@@ -67,29 +87,30 @@ services:
     ports:
       - "8002:8000"
     depends_on:
-      - pets_db
+      - pets-db
     restart: unless-stopped
     
 
-  bookings_db:
+  bookings-db:
     image: postgres:16-alpine
     volumes:
-      - booking_postgres_data:/var/lib/postgresql/data/
+      - booking-postgres-data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=bookings_db
+      - POSTGRES_DB=bookings-db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
 
-  booking_service:
+  booking-service:
     build:
-      context: ./services/booking_service
-    command: sh -c "python manage.py makemigrations bookings --noinput && python manage.py migrate --noinput && gunicorn booking_service.wsgi:application --bind 0.0.0.0:8000"
+      context: ./services/booking-service
+    command: sh -c "python manage.py migrate --noinput && gunicorn booking-service.wsgi:application --bind 0.0.0.0:8000"
+
     environment:
-      - DJANGO_SETTINGS_MODULE=booking_service.settings
-      - DB_NAME=bookings_db
+      - DJANGO_SETTINGS_MODULE=booking-service.settings
+      - DB_NAME=bookings-db
       - DB_USER=postgres
       - DB_PASSWORD=password
-      - DB_HOST=bookings_db
+      - DB_HOST=bookings-db
       - DB_PORT=5432
       - SHARED_JWT_SECRET=${SHARED_JWT_SECRET:-dev-shared-jwt-secret}
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-dev-django-secret}
@@ -97,65 +118,67 @@ services:
     ports:
       - "8003:8000"
     depends_on:
-      - bookings_db
+      - bookings-db
     restart: unless-stopped
     
 
-  job_posts_db:
+  job-posts-db:
     image: postgres:16-alpine
     volumes:
-      - job_post_postgres_data:/var/lib/postgresql/data/
+      - job-post-postgres-data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=job_posts_db
+      - POSTGRES_DB=job-posts-db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
 
-  job_post_service:
+  job-post-service:
     build: 
-      context: ./services/job_post_service
-    command: sh -c "python manage.py makemigrations job_posts --noinput && python manage.py migrate --noinput && gunicorn job_post_service.wsgi:application --bind 0.0.0.0:8000"
+      context: ./services/job-post-service
+    command: sh -c "python manage.py migrate --noinput && gunicorn job-post-service.wsgi:application --bind 0.0.0.0:8000"
+
     volumes:
-      - ./services/job_post_service:/app
+      - ./services/job-post-service:/app
     ports:
       - "8004:8000"
     environment:
       - DJANGO_SECRET_KEY=your-strong-secret-key
       - DEBUG=1
-      - DB_NAME=job_posts_db
+      - DB_NAME=job-posts-db
       - DB_USER=postgres
       - DB_PASSWORD=password
-      - DB_HOST=job_posts_db # <-- ชี้ไปยัง job_post_db
+      - DB_HOST=job-posts-db # <-- ชี้ไปยัง job_post_db
     depends_on:
-      - job_posts_db
+      - job-posts-db
     restart: unless-stopped
 
 
-  proposals_db:
+  proposals-db:
     image: postgres:16-alpine
     volumes:
-      - proposal_postgres_data:/var/lib/postgresql/data/
+      - proposal-postgres-data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=proposals_db
+      - POSTGRES_DB=proposals-db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
 
-  proposal_service:
+  proposal-service:
     build: 
-      context: ./services/proposal_service
-    command: sh -c "python manage.py makemigrations proposals --noinput && python manage.py migrate --noinput && gunicorn proposal_service.wsgi:application --bind 0.0.0.0:8000"
+      context: ./services/proposal-service
+    command: sh -c "python manage.py migrate --noinput && gunicorn proposal-service.wsgi:application --bind 0.0.0.0:8000"
+
     volumes:
-      - ./services/proposal_service:/app
+      - ./services/proposal-service:/app
     ports:
       - "8005:8000"
     environment:
       - DJANGO_SECRET_KEY=your-strong-secret-key
       - DEBUG=1
-      - DB_NAME=proposals_db
+      - DB_NAME=proposals-db
       - DB_USER=postgres
       - DB_PASSWORD=password
-      - DB_HOST=proposals_db # <-- ชี้ไปยัง proposal_db
+      - DB_HOST=proposals-db # <-- ชี้ไปยัง proposal_db
     depends_on:
-      - proposals_db
+      - proposals-db
     restart: unless-stopped
 
   # db:
@@ -169,8 +192,8 @@ services:
   #     - ./db/init:/docker-entrypoint-initdb.d
 
 volumes:
-  user_postgres_data:
-  pet_postgres_data:
-  booking_postgres_data:
-  job_post_postgres_data:
-  proposal_postgres_data:
+  user-postgres-data:
+  pet-postgres-data:
+  booking-postgres-data:
+  job-post-postgres-data:
+  proposal-postgres-data:

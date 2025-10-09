@@ -1,0 +1,21 @@
+<header class="bg-white shadow-md sticky top-0 z-50">
+    <nav class="max-w-6xl mx-auto flex items-center justify-between h-16 px-4">
+        <a href="/" class="text-xl font-bold text-green-600">PetTech</a>
+        <div class="flex items-center gap-4">
+            <div id="nav-guest-links" class="flex items-center gap-2">
+                <a href="/login.html" class="px-3 py-1.5 text-green-600 font-medium">Login</a>
+                <a href="/register.html" class="px-3 py-1.5 bg-green-600 text-white rounded-md font-medium">Register</a>
+            </div>
+            <div id="nav-user-links" class="hidden relative">
+                <button id="user-menu-button" class="font-medium flex items-center gap-2">
+                    <span id="nav-username"></span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
+                    <a href="/myprofile.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Profile</a>
+                    <button id="logout-button" class="block w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-gray-100">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>

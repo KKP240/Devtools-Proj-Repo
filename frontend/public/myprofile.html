@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Profile - PetTech</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+
+    <div include-html="/templates/nav.html"></div>
+
+    <main class="py-10 max-w-6xl mx-auto px-4">
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <div id="profile-header" class="p-6 bg-gray-200"><p>Loading your profile...</p></div>
+            <div class="p-6">
+                <div id="my-pets-section" class="mt-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">My Pets</h3>
+                    <p class="text-gray-600">Loading pets...</p>
+                </div>
+                <div id="my-posts-section" class="mt-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">My Job Posts</h3>
+                    <p class="text-gray-600">Loading job posts...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script src="/js/main.js"></script>
+    <script src="/js/include.js"></script>
+    <script src="/js/myprofile.js"></script> </body>
+</html>

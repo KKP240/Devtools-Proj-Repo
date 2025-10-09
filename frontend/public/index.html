@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home - PetTech</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+
+    <div include-html="/templates/nav.html"></div>
+
+    <main class="py-10 max-w-6xl mx-auto px-4">
+        <h1 class="text-2xl font-semibold text-gray-900">Find Pet Care Jobs</h1>
+        <form id="search-form" class="mt-2">
+            <input type="text" name="search" id="search-input" placeholder="Search for jobs..." class="w-full mt-2 p-2 border rounded-md">
+        </form>
+        <h2 class="text-xl font-semibold text-gray-800 my-4">Open Job Posts</h2>
+        <div id="job-posts-container" class="grid grid-cols-1 md:grid-cols-3 gap-6"><p>Loading...</p></div>
+    </main>
+    
+    <script src="/js/include.js"></script> <script src="/js/main.js"></script> <script src="/js/index.js"></script> </body>
+</html>

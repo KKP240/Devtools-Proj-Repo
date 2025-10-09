@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Caregiver Profile - PetTech</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+
+    <div include-html="/templates/nav.html"></div>
+
+    <main class="py-10 max-w-3xl mx-auto px-4">
+        <div class="bg-white p-6 rounded shadow">
+            <h2 id="form-title" class="text-lg font-medium mb-4 text-green-600">Edit Your Caregiver Profile</h2>
+            <form id="caregiver-form">
+                <div class="mb-4">
+                    <label for="bio" class="block text-sm font-medium text-gray-700">Bio / About Me</label>
+                    <textarea id="bio" name="bio" rows="4" class="mt-1 border rounded-md w-full px-3 py-2"></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="hourly_rate" class="block text-sm font-medium text-gray-700">Hourly Rate (฿)</label>
+                    <input type="number" id="hourly_rate" name="hourly_rate" step="0.01" class="mt-1 border rounded-md w-full px-3 py-2">
+                </div>
+                <div class="mb-4">
+                    <label for="area" class="block text-sm font-medium text-gray-700">Area</label>
+                    <input type="text" id="area" name="area" class="mt-1 border rounded-md w-full px-3 py-2">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Available Days</label>
+                    <div id="available-days-checkboxes" class="mt-2 grid grid-cols-4 gap-2">
+                        </div>
+                </div>
+                <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">Save Profile</button>
+                <p id="form-message" class="mt-4 text-sm"></p>
+            </form>
+        </div>
+    </main>
+    
+    <script src="/js/main.js"></script>
+    <script src="/js/include.js"></script>
+    <script src="/js/caregiver_profile_form.js"></script>
+</body>
+</html>

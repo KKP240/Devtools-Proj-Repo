@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Bookings - PetTech</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+
+    <div include-html="/templates/nav.html"></div>
+
+    <main class="py-10 max-w-6xl mx-auto px-4">
+        <h1 class="text-2xl font-semibold mb-6">My Bookings</h1>
+
+        <h2 class="text-xl font-semibold mt-8 mb-4">Bookings as Pet Owner</h2>
+        <div id="owner-bookings-container" class="space-y-4">
+            <p>Loading...</p>
+        </div>
+        
+        <h2 class="text-xl font-semibold mt-8 mb-4">Bookings as Caregiver</h2>
+        <div id="caregiver-bookings-container" class="space-y-4">
+            <p>Loading...</p>
+        </div>
+    </main>
+    
+    <script src="/js/main.js"></script>
+    <script src="/js/include.js"></script>
+    <script src="/js/my_bookings.js"></script>
+</body>
+</html>

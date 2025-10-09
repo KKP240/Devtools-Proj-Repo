@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Booking History{% endblock %}
+
+{% block content %}
+  <h1 class="text-2xl font-semibold text-gray-900 mb-6">Booking History</h1>
+  
+  <div class="bg-white shadow rounded-lg overflow-x-auto">
+    <table class="table w-full">
+      <thead>
+        <tr class="border-b border-gray-300">
+          <th class="text-left text-sm font-medium text-gray-500 p-4">ID</th>
+          <th class="text-left text-sm font-medium text-gray-500 p-4">Caregiver ID</th>
+          <th class="text-left text-sm font-medium text-gray-500 p-4">Pet ID</th>
+          <th class="text-left text-sm font-medium text-gray-500 p-4">Start Date</th>
+          <th class="text-left text-sm font-medium text-gray-500 p-4">End Date</th>
+          <th class="text-left text-sm font-medium text-gray-500 p-4">Status</th>
+          <th class="text-left text-sm font-medium text-gray-500 p-4">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="booking-history-table-body">
+        <tr>
+          <td colspan="7" class="text-center p-4 text-gray-500">Loading history...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script src="/js/main.js"></script>
+  <script src="/js/booking_history.js"></script>
+{% endblock %}

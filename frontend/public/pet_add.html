@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pet Form - PetTech</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+
+    <div include-html="/templates/nav.html"></div>
+
+    <main class="py-10 max-w-3xl mx-auto px-4">
+        <div class="bg-white p-6 rounded shadow">
+            <h2 id="form-title" class="text-xl font-semibold mb-4">Add Your Pet</h2>
+            <form id="pet-form" class="space-y-4">
+                <div>
+                    <label for="name" class="block text-sm font-medium">Name</label>
+                    <input type="text" id="name" name="name" required class="mt-1 w-full border rounded-md px-3 py-2">
+                </div>
+                <div>
+                    <label for="species" class="block text-sm font-medium">Species</label>
+                    <input type="text" id="species" name="species" required class="mt-1 w-full border rounded-md px-3 py-2">
+                </div>
+                <div>
+                    <label for="age" class="block text-sm font-medium">Age</label>
+                    <input type="number" id="age" name="age" class="mt-1 w-full border rounded-md px-3 py-2">
+                </div>
+                <div>
+                    <label for="notes" class="block text-sm font-medium">Notes</label>
+                    <textarea id="notes" name="notes" rows="3" class="mt-1 w-full border rounded-md px-3 py-2"></textarea>
+                </div>
+                <div>
+                    <label for="photo" class="block text-sm font-medium">Photo URL</label>
+                    <input type="url" id="photo" name="photo" placeholder="https://example.com/photo.jpg" class="mt-1 w-full border rounded-md px-3 py-2">
+                </div>
+                <div>
+                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded">Save Pet</button>
+                </div>
+                <p id="form-message" class="text-sm"></p>
+            </form>
+        </div>
+    </main>
+    
+    <script src="/js/main.js"></script>
+    <script src="/js/include.js"></script>
+    <script src="/js/pet_form.js"></script>
+</body>
+</html>
