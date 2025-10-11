@@ -11,4 +11,6 @@ urlpatterns = [
     # API: Proposals
     path('api/job-posts/<int:job_post_id>/proposals/', views.api_proposal_submit, name='api_proposal_submit'),
     path('api/job-posts/<int:job_post_id>/proposals/<int:proposal_id>/accept/', views.api_proposal_accept, name='api_proposal_accept'),
+    # API: My proposals list (for caregiver/owner)
+    path('api/my-proposals/', views.api_my_proposals, name='api_my_proposals'),
 ]
