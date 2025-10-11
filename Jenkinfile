@@ -1,18 +1,17 @@
 pipeline {
-    agent {
-        docker {
-            image 'python:3.11-slim'
-            args '-u root'
-        }
-    }
+    agent any
 
     environment {
-        DOCKER_IMAGE    = 'aunnutthawat/fastapi-webhook:latest'
+        // ข้อมูลสำคัญและ credential ID ใน Jenkins
+        DOCKER_IMAGE    = 'aunnutthawat/pettech:latest'
         REMOTE_HOST     = 'nutthawat@34.126.120.130'
         SSH_CREDENTIALS = 'ssh-prod_instance'
+        GIT_REPO        = 'https://github.com/KKP240/Devtools-Proj-Repo.git'
+        APP_NAME        = 'pettech'
     }
 
     stages {
+
         stage('Checkout from Git') {
             steps {
                 echo 'Pulling source code from Git repository...'
@@ -24,7 +23,6 @@ pipeline {
             steps {
                 echo 'Installing dependencies and running unit tests...'
                 sh '''
-                    python -m venv venv
                     . venv/bin/activate
                     pip install -r requirements.txt
                     pytest --maxfail=1 --disable-warnings -q
@@ -34,12 +32,14 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $DOCKER_IMAGE .'
+                echo 'Building Docker image...'
+                sh "docker build -t ${DOCKER_IMAGE} ."
             }
         }
 
         stage('Login to Docker Hub') {
             steps {
+                echo 'Logging into Docker Hub...'
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_PASSWORD', usernameVariable: 'DOCKERHUB_USER')]) {
                     sh 'echo $DOCKERHUB_PASSWORD | docker login --username $DOCKERHUB_USER --password-stdin'
                 }
@@ -48,29 +48,35 @@ pipeline {
 
         stage('Push Docker Image to Docker Hub') {
             steps {
-                sh 'docker push $DOCKER_IMAGE'
+                echo 'Pushing Docker image to Docker Hub...'
+                sh "docker push ${DOCKER_IMAGE}"
             }
         }
 
         stage('Deploy to Remote Server') {
             steps {
+                echo 'Deploying application on remote server...'
                 sshagent([SSH_CREDENTIALS]) {
-                    sh "ssh -o StrictHostKeyChecking=no $REMOTE_HOST 'docker stop \$(docker ps -a -q) || true'"
-                    sh "ssh -o StrictHostKeyChecking=no $REMOTE_HOST 'docker rm \$(docker ps -a -q) || true'"
-                    sh "ssh -o StrictHostKeyChecking=no $REMOTE_HOST 'docker rmi \$(docker images -q) || true'"
-                    sh "ssh -o StrictHostKeyChecking=no $REMOTE_HOST 'docker run -d --name fastapi-webhook -p 8085:80 $DOCKER_IMAGE'"
-                    sh "ssh -o StrictHostKeyChecking=no $REMOTE_HOST 'docker ps -a'"
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ${REMOTE_HOST} '
+                            docker stop ${APP_NAME} || true &&
+                            docker rm ${APP_NAME} || true &&
+                            docker pull ${DOCKER_IMAGE} &&
+                            docker run -d --name ${APP_NAME} -p 8085:80 ${DOCKER_IMAGE}
+                        '
+                    """
+                    sh "ssh -o StrictHostKeyChecking=no ${REMOTE_HOST} 'docker ps -a'"
                 }
             }
         }
     }
 
     post {
+        success {
+            echo '✅ Deployment successful!'
+        }
         failure {
             echo '❌ Pipeline failed. Please check the logs.'
-        }
-        success {
-            echo '✅ Pipeline completed successfully.'
         }
     }
 }
