@@ -1,5 +1,17 @@
 version: '3.8'
 services:
+  gateway:
+    image: nginx:1.27-alpine
+    ports:
+      - "8000:80"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+    depends_on:
+      - users
+      - jobs
+      - bookings
+      - web
+
   users:
     build: .
     environment:
@@ -39,6 +51,19 @@ services:
     ports:
       - "8003:8000"
     restart: unless-stopped
+
+  web:
+    build: .
+    environment:
+      - SERVICE=web
+      - DJANGO_DEBUG=false
+    env_file:
+      - .env
+    depends_on:
+      - db
+    # Expose only inside compose network; gateway proxies it
+    ports:
+      - "8004:8000"
 
   db:
     image: postgres:15

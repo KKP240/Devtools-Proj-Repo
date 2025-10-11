@@ -15,6 +15,10 @@ case "$SERVICE" in
     export DJANGO_SETTINGS_MODULE=pettech.settings_bookings
     MODULE=pettech.wsgi_bookings:application
     ;;
+  web)
+    export DJANGO_SETTINGS_MODULE=pettech.settings_web
+    MODULE=pettech.wsgi:application
+    ;;
   *)
     export DJANGO_SETTINGS_MODULE=pettech.settings
     MODULE=pettech.wsgi:application
