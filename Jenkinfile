@@ -33,12 +33,29 @@ pipeline {
         // Stage 2: รัน Unit Test (ตัวอย่างสำหรับ Python)
         stage('Unit Test') {
             steps {
-                echo "Running Unit Tests..."
-                // สมมติว่าโปรเจกต์มี requirements.txt และใช้ pytest
-                // คำสั่งนี้จะทำงานบน Jenkins Agent ที่มี Python และ pip ติดตั้งอยู่
-                sh 'pip install -r requirements.txt'
-                sh 'pytest' 
+                echo "Running Unit Tests using a Virtual Environment..."
+                
+                // ใช้ sh block เดียวเพื่อให้ shell session ต่อเนื่อง
+                sh '''
+                    # 1. สร้าง Virtual Environment
+                    python3 -m venv venv
+                    
+                    # 2. ติดตั้ง Dependencies โดยใช้ pip จากใน venv
+                    # ไม่ต้อง activate แต่เรียกใช้ executable โดยตรงจะเสถียรกว่าใน script
+                    ./venv/bin/pip install -r requirements.txt
+                    
+                    # 3. รันเทสต์โดยใช้ pytest จากใน venv
+                    ./venv/bin/pytest
+                '''
+                
                 echo "Unit tests passed."
+            }
+            post {
+                // ทำความสะอาด workspace หลังเทสต์เสร็จเสมอ
+                always {
+                    echo "Cleaning up virtual environment..."
+                    sh 'rm -rf venv'
+                }
             }
         }
 
