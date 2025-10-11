@@ -38,12 +38,12 @@ pipeline {
                 sh '''
                     # 1. สร้าง Virtual Environment
                     python3 -m venv venv
-                    cd pettech
                     
                     # 2. ติดตั้ง Dependencies (ใช้ requirements.txt ก็พอ เพราะ Django test runner มากับตัว Django เอง)
-                    ../venv/bin/pip install -r requirements.txt
+                    ./venv/bin/pip install -r requirements.txt
                     
                     # 3. รันเทสต์โดยใช้ manage.py ของ Django
+                    cd pettech
                     ../venv/bin/python manage.py test
                 '''
                 
