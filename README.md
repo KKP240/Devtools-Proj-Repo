@@ -2,6 +2,55 @@
 
 นี่คือ backend ของโปรเจกต์ PetTech ที่พัฒนาด้วย Django และ Django REST Framework คู่มือนี้จะอธิบายวิธีการตั้งค่าและรันโปรเจกต์ในเครื่องของคุณให้ทำงานได้เหมือนกับของผู้พัฒนา รวมถึงปัญหาที่อาจเกิดขึ้นและวิธีแก้ไขเบื้องต้น
 
+## Microservices layout
+
+The monolithic Django app has been split into three deployable services that share the same codebase and database but expose only their own endpoints:
+
+- users service (port 8001): auth and user-centric endpoints
+   - GET /api/me/
+   - plus basic HTML auth routes: /login/, /logout/, /register/
+- jobs service (port 8002): job posts and proposals
+   - GET/POST /api/job-posts/, /api/job-posts/create/
+   - GET /api/job-posts/<id>/, PUT/PATCH /api/job-posts/<id>/update/, DELETE /api/job-posts/<id>/delete/
+   - POST /api/job-posts/<job_post_id>/proposals/
+   - POST /api/job-posts/<job_post_id>/proposals/<proposal_id>/accept/
+- bookings service (port 8003): bookings, reviews and caregiver public profile
+   - GET /api/bookings/
+   - POST /api/bookings/<booking_id>/complete/
+   - GET /api/booking-history/
+   - POST /api/reviews/
+   - GET /api/caregiver/<id>/
+
+Each service is configured via a dedicated Django settings module and WSGI entrypoint and runs in its own container.
+
+## Run locally with Docker
+
+Prerequisites: Docker Desktop installed and running.
+
+1. Build images
+    - docker compose build
+2. Start services
+    - docker compose up -d
+3. Access endpoints
+    - users: http://localhost:8001/api/me/
+    - jobs: http://localhost:8002/api/job-posts/
+    - bookings: http://localhost:8003/api/bookings/
+
+To view logs of a service:
+   - docker compose logs -f users
+   - docker compose logs -f jobs
+   - docker compose logs -f bookings
+
+## Environment
+
+Database connection is read from .env. When running in Docker, the host is set to `db` (the compose service name).
+
+## Notes and next steps
+
+This is a first step towards microservices by isolating API surfaces per container while sharing the same database and code. Future steps to fully decouple include:
+- Split models into separate Django apps or repositories per bounded context.
+- Introduce service-to-service communication (HTTP or messaging) and separate databases.
+- Add service-level authentication (JWT) and an API gateway for routing.
 ## สารบัญ
 - [สิ่งที่ต้องเตรียม](#สิ่งที่ต้องเตรียม)
 - [ขั้นตอนการตั้งค่า](#ขั้นตอนการตั้งค่า)

@@ -1,21 +1,55 @@
 version: '3.8'
 services:
-  web:
+  users:
     build: .
-    command: gunicorn pettech.wsgi:application --bind 0.0.0.0:8000
-    ports:
-      - "8000:8000"
+    environment:
+      - SERVICE=users
+      - DJANGO_DEBUG=false
+      - RUN_MIGRATIONS=true
     env_file:
       - .env
     depends_on:
       - db
+    ports:
+      - "8001:8000"
+    restart: unless-stopped
+
+  jobs:
+    build: .
+    environment:
+      - SERVICE=jobs
+      - DJANGO_DEBUG=false
+    env_file:
+      - .env
+    depends_on:
+      - db
+    ports:
+      - "8002:8000"
+    restart: unless-stopped
+
+  bookings:
+    build: .
+    environment:
+      - SERVICE=bookings
+      - DJANGO_DEBUG=false
+    env_file:
+      - .env
+    depends_on:
+      - db
+    ports:
+      - "8003:8000"
+    restart: unless-stopped
+
   db:
     image: postgres:15
     environment:
-      POSTGRES_DB: pettech
-      POSTGRES_USER: pettech
-      POSTGRES_PASSWORD: changeme
+      POSTGRES_DB: ${DATABASE_NAME:-pettech}
+      POSTGRES_USER: ${DATABASE_USER:-postgres}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-postgres}
     volumes:
       - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
 volumes:
   pgdata:
