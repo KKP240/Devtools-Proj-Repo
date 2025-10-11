@@ -65,7 +65,7 @@ pipeline {
                         ssh -o StrictHostKeyChecking=no ${env.REMOTE_HOST} '
                             # 1. เข้าไปในโฟลเดอร์โปรเจกต์บน Server
                             echo "1. Navigating to project directory: ${env.PROJECT_PATH}"
-                            cd ${env.PROJECT_PATH}
+                            cd ${env.PROJECT_PATH} 
 
                             # 2. อัปเดตโค้ดเวอร์ชันล่าสุดจาก Git
                             echo "2. Pulling latest code from Git..."
