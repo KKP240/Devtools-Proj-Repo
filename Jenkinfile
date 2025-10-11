@@ -3,115 +3,90 @@ pipeline {
 
     environment {
         // --- Configuration ---
-        // ชื่อ Docker Image ในรูปแบบ: <dockerhub_username>/<repository_name>:<tag>
         DOCKER_IMAGE      = 'aunnutthawat/pettech:latest'
-        
-        // ID ของ Credentials สำหรับ Docker Hub ที่ตั้งค่าไว้ใน Jenkins
         DOCKERHUB_CRED_ID = 'dockerhub'
 
         // --- Deployment Target ---
-        // Server ปลายทางในรูปแบบ: <username>@<ip_address>
-        REMOTE_HOST       = 'nutthawat@34.126.120.130' 
-
-        // ID ของ Credentials สำหรับ SSH Key ที่ตั้งค่าไว้ใน Jenkins
-        SSH_CREDENTIALS   = 'ssh-prod_instance' 
-
-        // ชื่อของ Container ที่จะรันบน Production Server
-        CONTAINER_NAME    = 'pettech' 
+        REMOTE_HOST       = 'nutthawat@34.126.120.130'
+        SSH_CREDENTIALS   = 'ssh-prod_instance'
+        
+        // *** ตัวแปรใหม่: ระบุ Path ของโปรเจกต์บนเครื่อง Server ปลายทาง ***
+        PROJECT_PATH      = '~/Devtools-Proj-Repo' // <--- !! แก้ไขให้เป็น Path จริง !!
     }
 
     stages {
-        // Stage 1: ดึงโค้ดจาก Git Repository
+        // Stage 1: Checkout SCM (เหมือนเดิม)
         stage('Checkout SCM') {
             steps {
-                // ต้องตั้งค่า Git Repository ใน Jenkins Job Configuration
                 git branch: 'cilent-side-rendering', url: 'https://github.com/KKP240/Devtools-Proj-Repo.git'
                 echo "Source code checked out successfully."
             }
         }
 
-        // Stage 2: รัน Unit Test (ตัวอย่างสำหรับ Python)
+        // Stage 2: Unit Test (เหมือนเดิม)
         stage('Unit Test') {
             steps {
                 echo "Running Django Tests using a Virtual Environment..."
-                
                 sh '''
-                    # 1. สร้าง Virtual Environment
                     python3 -m venv venv
-                    
-                    # 2. ติดตั้ง Dependencies (ใช้ requirements.txt ก็พอ เพราะ Django test runner มากับตัว Django เอง)
                     ./venv/bin/pip install -r requirements.txt
-                    
-                    # 3. รันเทสต์โดยใช้ manage.py ของ Django
                     cd pettech
                     ../venv/bin/python manage.py test
                 '''
-                
                 echo "Django tests passed."
             }
             post {
                 always {
-                    echo "Cleaning up virtual environment..."
                     sh 'rm -rf venv'
                 }
             }
         }
 
-        // Stage 3: สร้างและ Push Docker Image ไปยัง Docker Hub
+        // Stage 3: Build & Push Docker Image (เหมือนเดิม)
         stage('Build & Push Docker Image') {
             steps {
                 echo "Building Docker image: ${env.DOCKER_IMAGE}"
-                // ใช้ Docker build เพื่อสร้าง Image
                 sh "docker build -t ${env.DOCKER_IMAGE} ."
-                
-                // Login และ Push Image ไปยัง Docker Hub
                 withCredentials([usernamePassword(credentialsId: env.DOCKERHUB_CRED_ID, passwordVariable: 'DOCKERHUB_PASSWORD', usernameVariable: 'DOCKERHUB_USER')]) {
                     echo "Logging in to Docker Hub..."
                     sh 'echo $DOCKERHUB_PASSWORD | docker login --username $DOCKERHUB_USER --password-stdin'
-                    
                     echo "Pushing image to Docker Hub..."
                     sh "docker push ${env.DOCKER_IMAGE}"
                 }
             }
         }
 
-        // Stage 4: นำแอปพลิเคชันขึ้นสู่ระบบ (Deployment)
-        stage('Deploy to Production') {
+        // --- STAGE 4: DEPLOY โดยใช้ DOCKER-COMPOSE (แก้ไขใหม่ทั้งหมด) ---
+        stage('Deploy with Docker Compose') {
             steps {
-                echo "Deploying to production server: ${env.REMOTE_HOST}"
-                // ใช้ SSH Agent Plugin เพื่อจัดการ SSH Key อย่างปลอดภัย
+                echo "Deploying application stack to ${env.REMOTE_HOST}"
                 sshagent([SSH_CREDENTIALS]) {
-                    // คำสั่งที่ส่งไปรันบน Remote Server
-                    // **ปรับปรุงให้ปลอดภัยและมีประสิทธิภาพมากขึ้น**
                     sh """
                         ssh -o StrictHostKeyChecking=no ${env.REMOTE_HOST} '
-                            echo "--- Starting Deployment on Production Server ---"
-                            
-                            # 1. ดึง Image เวอร์ชันล่าสุดจาก Docker Hub
-                            echo "1. Pulling latest Docker image..."
+                            # 1. เข้าไปในโฟลเดอร์โปรเจกต์บน Server
+                            echo "1. Navigating to project directory: ${env.PROJECT_PATH}"
+                            cd ${env.PROJECT_PATH}
+
+                            # 2. อัปเดตโค้ดเวอร์ชันล่าสุดจาก Git
+                            echo "2. Pulling latest code from Git..."
+                            git pull
+
+                            # 3. ดึง Image หลักที่เพิ่ง Build มาใหม่ เพื่อความแน่นอน
+                            echo "3. Pulling latest application image from Docker Hub..."
                             docker pull ${env.DOCKER_IMAGE}
-                            
-                            # 2. หยุดและลบ Container ตัวเก่า (ถ้ามีอยู่) โดยอ้างอิงจากชื่อ
-                            echo "2. Stopping and removing old container..."
-                            docker stop ${env.CONTAINER_NAME} || true
-                            docker rm ${env.CONTAINER_NAME} || true
-                            
-                            # 3. รัน Container ตัวใหม่จาก Image ที่เพิ่งดึงมา
-                            echo "3. Running new container..."
-                            docker run -d --name ${env.CONTAINER_NAME} -p 8086:8000 -e "SERVICE=web" ${env.DOCKER_IMAGE}
 
+                            # 4. หยุดและลบ Container ทั้งหมดที่เคยรันไว้
+                            echo "4. Shutting down the old application stack..."
+                            docker-compose down
 
-                            echo "Pausing for 5 seconds to allow container to start..."
-                            sleep 5 
-                            docker logs ${env.CONTAINER_NAME}
+                            # 5. สร้างและรัน Container ทั้ง 6 ตัวขึ้นมาใหม่จากไฟล์ docker-compose.yaml
+                            echo "5. Starting the new application stack..."
+                            docker-compose up -d
+
+                            # 6. แสดงสถานะของ Container ทั้งหมดที่รันอยู่
+                            echo "6. Verifying running services..."
+                            docker-compose ps
                             
-                            # 4. ลบ Image เก่าที่ไม่ได้ใช้งาน (Dangling images) เพื่อประหยัดพื้นที่
-                            echo "4. Cleaning up old images..."
-                            docker image prune -f
-                            
-                            # 5. แสดงสถานะ Container ทั้งหมดเพื่อยืนยัน
-                            echo "5. Verifying running containers..."
-                            docker ps -a
                             echo "--- Deployment Complete ---"
                         '
                     """
@@ -121,10 +96,8 @@ pipeline {
     }
     
     post {
-        // บล็อกนี้จะทำงานเสมอ ไม่ว่า Pipeline จะสำเร็จหรือล้มเหลว
         always {
             echo 'Pipeline finished. Cleaning up...'
-            // Logout จาก Docker Hub เพื่อความปลอดภัย
             sh 'docker logout'
         }
         success {
