@@ -98,7 +98,8 @@ pipeline {
                             
                             # 3. รัน Container ตัวใหม่จาก Image ที่เพิ่งดึงมา
                             echo "3. Running new container..."
-                            docker run -d --name ${env.CONTAINER_NAME} -p 8086:8000 ${env.DOCKER_IMAGE}
+                            docker run -d --name ${env.CONTAINER_NAME} -p 8086:8000 -e "SERVICE=web" ${env.DOCKER_IMAGE}
+
 
                             echo "Pausing for 5 seconds to allow container to start..."
                             sleep 5 
