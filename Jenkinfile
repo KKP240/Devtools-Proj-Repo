@@ -41,10 +41,10 @@ pipeline {
                     cd pettech
                     
                     # 2. ติดตั้ง Dependencies (ใช้ requirements.txt ก็พอ เพราะ Django test runner มากับตัว Django เอง)
-                    ./venv/bin/pip install -r requirements.txt
+                    ../venv/bin/pip install -r requirements.txt
                     
                     # 3. รันเทสต์โดยใช้ manage.py ของ Django
-                    ./venv/bin/python manage.py test
+                    ../venv/bin/python manage.py test
                 '''
                 
                 echo "Django tests passed."
