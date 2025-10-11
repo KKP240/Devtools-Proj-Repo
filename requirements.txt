@@ -9,4 +9,3 @@ sqlparse==0.5.3
 PyJWT==2.10.1
 tzdata==2025.2
 whitenoise==6.7.0
-pytest

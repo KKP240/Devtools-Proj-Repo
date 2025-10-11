@@ -33,25 +33,22 @@ pipeline {
         // Stage 2: รัน Unit Test (ตัวอย่างสำหรับ Python)
         stage('Unit Test') {
             steps {
-                echo "Running Unit Tests using a Virtual Environment..."
+                echo "Running Django Tests using a Virtual Environment..."
                 
-                // ใช้ sh block เดียวเพื่อให้ shell session ต่อเนื่อง
                 sh '''
                     # 1. สร้าง Virtual Environment
                     python3 -m venv venv
                     
-                    # 2. ติดตั้ง Dependencies โดยใช้ pip จากใน venv
-                    # ไม่ต้อง activate แต่เรียกใช้ executable โดยตรงจะเสถียรกว่าใน script
+                    # 2. ติดตั้ง Dependencies (ใช้ requirements.txt ก็พอ เพราะ Django test runner มากับตัว Django เอง)
                     ./venv/bin/pip install -r requirements.txt
                     
-                    # 3. รันเทสต์โดยใช้ pytest จากใน venv
-                    ./venv/bin/pytest
+                    # 3. รันเทสต์โดยใช้ manage.py ของ Django
+                    ./venv/bin/python manage.py test
                 '''
                 
-                echo "Unit tests passed."
+                echo "Django tests passed."
             }
             post {
-                // ทำความสะอาด workspace หลังเทสต์เสร็จเสมอ
                 always {
                     echo "Cleaning up virtual environment..."
                     sh 'rm -rf venv'
