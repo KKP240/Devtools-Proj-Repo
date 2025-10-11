@@ -1,79 +1,83 @@
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    REGISTRY = 'aunnutthawat/fastapi-webhook:latest'          // หรือ docker.io/youruser
-    APP_NAME = 'pettech'
-    COMMIT = "${env.GIT_COMMIT ?: 'dev'}"
-    REGISTRY_CREDS = 'dockerhub-credentials' // credentials สำหรับ docker registry
-    DEPLOY_HOST = '34.126.120.130'
-    DEPLOY_USER = 'nutthawat'
-    REMOTE_APP_DIR = '/home/nutthawat/pettech' // โปรเจกต์ path บนเครื่องปลายทาง
-    GIT_REPO = 'https://github.com/KKP240/Devtools-Proj-Repo.git'
-  }
-
-  options {
-    timestamps()
-  }
-
-  stages {
-
-    stage('Checkout') {
-      steps {
-        checkout scm
-      }
+    environment {
+        // ข้อมูลสำคัญและ credential ID ใน Jenkins
+        DOCKER_IMAGE    = 'aunnutthawat/pettech:latest'
+        REMOTE_HOST     = 'nutthawat@34.126.120.130'
+        SSH_CREDENTIALS = 'ssh-prod_instance'
+        GIT_REPO        = 'https://github.com/KKP240/Devtools-Proj-Repo.git'
+        APP_NAME        = 'pettech'
     }
 
-    stage('Build & Push Images') {
-      steps {
-        sh '''
-          set -e
-          docker build -t ${REGISTRY}/${APP_NAME}-users:${COMMIT} services/users/.
-          docker build -t ${REGISTRY}/${APP_NAME}-jobs:${COMMIT} services/jobs/.
-          docker build -t ${REGISTRY}/${APP_NAME}-bookings:${COMMIT} services/bookings/.
-          docker build -t ${REGISTRY}/${APP_NAME}-web:${COMMIT} web/.
-        '''
+    stages {
 
-        withCredentials([usernamePassword(credentialsId: "${REGISTRY_CREDS}", passwordVariable: 'REG_PASS', usernameVariable: 'REG_USER')]) {
-          sh '''
-            echo "${REG_PASS}" | docker login ${REGISTRY} -u "${REG_USER}" --password-stdin
-            docker push ${REGISTRY}/${APP_NAME}-users:${COMMIT}
-            docker push ${REGISTRY}/${APP_NAME}-jobs:${COMMIT}
-            docker push ${REGISTRY}/${APP_NAME}-bookings:${COMMIT}
-            docker push ${REGISTRY}/${APP_NAME}-web:${COMMIT}
-            docker logout ${REGISTRY}
-          '''
+        stage('Checkout from Git') {
+            steps {
+                echo 'Pulling source code from Git repository...'
+                git branch: 'client-side-rendering', url: "${GIT_REPO}"
+            }
         }
-      }
-    }
 
-    stage('Deploy (Pull from GitHub)') {
-      steps {
-        sshagent(credentials: ['ssh-prod_instance']) {
-          sh '''
-            ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} "
-              set -e
-              if [ ! -d '${REMOTE_APP_DIR}' ]; then
-                git clone ${GIT_REPO} ${REMOTE_APP_DIR}
-              fi
-              cd ${REMOTE_APP_DIR}
-              git fetch origin
-              git reset --hard origin/main   # หรือสาขาที่ต้องการ เช่น 'main' หรือ 'production'
-              export REGISTRY=${REGISTRY}
-              export APP_NAME=${APP_NAME}
-              export COMMIT=${COMMIT}
-              docker compose pull users jobs bookings web || true
-              docker compose up -d --no-deps users jobs bookings web gateway
-            "
-          '''
+        stage('Install Dependencies & Unit Test') {
+            steps {
+                echo 'Installing dependencies and running unit tests...'
+                sh '''
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install -r requirements.txt
+                    pytest --maxfail=1 --disable-warnings -q
+                '''
+            }
         }
-      }
-    }
-  }
 
-  post {
-    always {
-      echo 'Pipeline finished.'
+        stage('Build Docker Image') {
+            steps {
+                echo 'Building Docker image...'
+                sh "docker build -t ${DOCKER_IMAGE} ."
+            }
+        }
+
+        stage('Login to Docker Hub') {
+            steps {
+                echo 'Logging into Docker Hub...'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_PASSWORD', usernameVariable: 'DOCKERHUB_USER')]) {
+                    sh 'echo $DOCKERHUB_PASSWORD | docker login --username $DOCKERHUB_USER --password-stdin'
+                }
+            }
+        }
+
+        stage('Push Docker Image to Docker Hub') {
+            steps {
+                echo 'Pushing Docker image to Docker Hub...'
+                sh "docker push ${DOCKER_IMAGE}"
+            }
+        }
+
+        stage('Deploy to Remote Server') {
+            steps {
+                echo 'Deploying application on remote server...'
+                sshagent([SSH_CREDENTIALS]) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ${REMOTE_HOST} '
+                            docker stop ${APP_NAME} || true &&
+                            docker rm ${APP_NAME} || true &&
+                            docker pull ${DOCKER_IMAGE} &&
+                            docker run -d --name ${APP_NAME} -p 8085:80 ${DOCKER_IMAGE}
+                        '
+                    """
+                    sh "ssh -o StrictHostKeyChecking=no ${REMOTE_HOST} 'docker ps -a'"
+                }
+            }
+        }
     }
-  }
+
+    post {
+        success {
+            echo '✅ Deployment successful!'
+        }
+        failure {
+            echo '❌ Pipeline failed. Please check the logs.'
+        }
+    }
 }
