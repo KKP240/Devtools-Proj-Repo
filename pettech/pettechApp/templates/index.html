@@ -15,32 +15,8 @@
 <!-- Job Posts Section -->
 <div class="mt-12">
   <h2 class="text-xl font-semibold text-gray-800 mb-4">งานดูแลสัตว์เลี้ยง</h2>
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    {% for job in job_posts %}
-      <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-        <a href="{% url 'job_post_detail' job.pk %}">
-          <div class="h-48 bg-gray-100 flex items-center justify-center">
-            <!-- Use pet photo if available, else placeholder -->
-            {% if job.pet.photo %}
-              <img src="{{ job.pet.photo }}" alt="{{ job.pet.name }}" class="h-full w-full object-cover">
-            {% else %}
-              <span class="text-gray-400">Pet Photo</span>
-            {% endif %}
-          </div>
-          <div class="p-4">
-            <h3 class="text-lg font-semibold text-gray-800">
-              {{ job.title }}
-            </h3>
-            <p class="text-sm text-gray-500 mb-1">สัตว์เลี้ยง: {{ job.pet.name }} ({{ job.pet.species }})</p>
-            <p class="text-sm text-gray-500 mb-1">วันที่: {{ job.start|date:"d M Y H:i" }} - {{ job.end|date:"d M Y H:i" }}</p>
-            <p class="text-sm text-gray-500 mb-1">งบประมาณ: {% if job.budget %}฿{{ job.budget }}{% else %}ไม่ระบุ{% endif %}</p>
-            <p class="text-gray-600 text-sm line-clamp-3">{{ job.description|truncatechars:120 }}</p>
-          </div>
-        </a>
-      </div>
-    {% empty %}
-      <p class="text-gray-500">ยังไม่มีงานดูแลสัตว์เลี้ยงในระบบ</p>
-    {% endfor %}
+  <div id="job-posts-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Rendered by JS -->
   </div>
 </div>
 {% endblock content %}

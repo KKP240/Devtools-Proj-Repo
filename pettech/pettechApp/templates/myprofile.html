@@ -84,7 +84,7 @@
         <div class="bg-gray-50 p-4 rounded-lg">
           <h2 class="text-sm font-medium text-gray-600">Caregiver Status</h2>
           <div class="mt-3">
-              <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">✓ Registered as Caregiver</span>
+              <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">{% if caregiver_profile %} ✓ Registered as Caregiver{% else %} ✗ Not Registered as Caregiver{% endif %}</span>
           </div>
         </div>
 

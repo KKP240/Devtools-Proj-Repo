@@ -3,20 +3,5 @@
 {% block content %}
 <h2 class="text-2xl font-bold mb-4">My Proposals</h2>
 
-{% if proposals %}
-  <div class="grid grid-cols-1 gap-4">
-    {% for proposal in proposals %}
-      <div class="bg-white p-4 shadow rounded">
-        <p><strong>Job:</strong> <a href="{% url 'job_post_detail' proposal.job_post.id %}" class="text-blue-600">{{ proposal.job_post.title }}</a></p>
-        <p><strong>Job Owner:</strong> {{ proposal.job_post.owner.get_full_name|default:proposal.job_post.owner.username }}</p>
-        <p><strong>Caregiver:</strong> {{ proposal.caregiver.get_full_name|default:proposal.caregiver.username }}</p>
-        <p><strong>Status:</strong> {{ proposal.get_status_display }}</p>
-        <p><strong>Rate:</strong> {{ proposal.proposed_rate }} บาท</p>
-        <p><strong>Message:</strong> {{ proposal.message }}</p>
-      </div>
-    {% endfor %}
-  </div>
-{% else %}
-  <p>You have not submitted any proposals yet.</p>
-{% endif %}
+<div id="my-proposals" class="grid grid-cols-1 gap-4"></div>
 {% endblock %}

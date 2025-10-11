@@ -52,4 +52,20 @@ urlpatterns = [
     path("login/", views.LoginView.as_view(), name="login"),
     path("logout/", views.LogoutView.as_view(), name="logout"),
     path("register/", views.register, name="register"),
+
+    # API routes
+    path('api/me/', views.api_me, name='api_me'),
+    path('api/job-posts/', views.api_job_posts, name='api_job_posts'),
+    path('api/job-posts/create/', views.api_job_post_create, name='api_job_post_create'),
+    path('api/job-posts/<int:pk>/', views.api_job_post_detail, name='api_job_post_detail'),
+    path('api/job-posts/<int:pk>/update/', views.api_job_post_update, name='api_job_post_update'),
+    path('api/job-posts/<int:pk>/delete/', views.api_job_post_delete, name='api_job_post_delete'),
+    path('api/job-posts/<int:job_post_id>/proposals/', views.api_proposal_submit, name='api_proposal_submit'),
+    path('api/job-posts/<int:job_post_id>/proposals/<int:proposal_id>/accept/', views.api_proposal_accept, name='api_proposal_accept'),
+    path('api/bookings/', views.api_bookings, name='api_bookings'),
+    path('api/bookings/<int:booking_id>/complete/', views.api_booking_complete, name='api_booking_complete'),
+    path('api/booking-history/', views.api_booking_history, name='api_booking_history'),
+    path('api/reviews/', views.api_review_create, name='api_review_create'),
+    path('api/caregiver/<int:pk>/', views.api_caregiver_profile, name='api_caregiver_profile'),
+    path('api/my-proposals/', views.api_my_proposals, name='api_my_proposals'),
 ]
