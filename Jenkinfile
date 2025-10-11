@@ -11,7 +11,7 @@ pipeline {
         SSH_CREDENTIALS   = 'ssh-prod_instance'
         
         // *** ตัวแปรใหม่: ระบุ Path ของโปรเจกต์บนเครื่อง Server ปลายทาง ***
-        PROJECT_PATH      = '/home/aungodzilla2548/Devtools-Proj-Repo' // <--- !! แก้ไขให้เป็น Path จริง !!
+        PROJECT_PATH      = '/home/nutthawat/Devtools-Proj-Repo' // <--- !! แก้ไขให้เป็น Path จริง !!
     }
 
     stages {
