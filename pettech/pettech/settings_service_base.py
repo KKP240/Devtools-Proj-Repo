@@ -21,3 +21,18 @@ CSRF_TRUSTED_ORIGINS = list(set((locals().get('CSRF_TRUSTED_ORIGINS') or []) + [
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_HTTPONLY = False
+
+# --- Static files via WhiteNoise ---
+# Ensure middleware is present directly after SecurityMiddleware
+if 'whitenoise.middleware.WhiteNoiseMiddleware' not in MIDDLEWARE:
+	try:
+		sec_index = MIDDLEWARE.index('django.middleware.security.SecurityMiddleware')
+		MIDDLEWARE.insert(sec_index + 1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+	except ValueError:
+		MIDDLEWARE = ['whitenoise.middleware.WhiteNoiseMiddleware'] + MIDDLEWARE
+
+# Where collectstatic will place files
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Use compressed manifest storage for stable filenames
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

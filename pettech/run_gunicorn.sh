@@ -40,4 +40,9 @@ if [ "${RUN_MIGRATIONS:-false}" = "true" ]; then
   done
 fi
 
+# Collect static files only for web container
+if [ "$SERVICE" = "web" ]; then
+  python pettech/manage.py collectstatic --noinput || true
+fi
+
 exec python -m gunicorn "$MODULE" --bind 0.0.0.0:8000
