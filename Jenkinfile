@@ -15,7 +15,7 @@ pipeline {
         stage('Checkout from Git') {
             steps {
                 echo 'Pulling source code from Git repository...'
-                git branch: 'client-side-rendering', url: "${GIT_REPO}"
+                git branch: 'cilent-side-rendering', url: "${GIT_REPO}"
             }
         }
 
