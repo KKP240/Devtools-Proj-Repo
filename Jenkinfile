@@ -2,38 +2,30 @@ pipeline {
     agent any
 
     environment {
-        // --- Configuration ---
-        DOCKER_IMAGE      = 'aunnutthawat/pettech:latest'
-        DOCKERHUB_CRED_ID = 'dockerhub'
+        // Remote deployment info
+        REMOTE_HOST = 'nutthawat@34.126.120.130'  // change to your actual user@ip
+        SSH_CREDENTIALS = 'ssh-prod_instance'     // Jenkins SSH credentials ID
 
-        // --- Deployment Target ---
-        REMOTE_HOST       = 'nutthawat@34.126.120.130'
-        SSH_CREDENTIALS   = 'ssh-prod_instance'
-        
-        // *** ตัวแปรใหม่: ระบุ Path ของโปรเจกต์บนเครื่อง Server ปลายทาง ***
-        PROJECT_PATH      = '/home/aungodzilla2548/Devtools-Proj-Repo' // <--- !! แก้ไขให้เป็น Path จริง !!
+        REMOTE_APP_DIR = '/opt/pettech'           // This dir on the remote server must have docker-compose.yml and source code
     }
 
     stages {
-        // Stage 1: Checkout SCM (เหมือนเดิม)
-        stage('Checkout SCM') {
+        stage('Checkout Source') {
             steps {
                 git branch: 'cilent-side-rendering', url: 'https://github.com/KKP240/Devtools-Proj-Repo.git'
                 echo "Source code checked out successfully."
             }
         }
 
-        // Stage 2: Unit Test (เหมือนเดิม)
-        stage('Unit Test') {
+        stage('Unit Tests') {
             steps {
-                echo "Running Django Tests using a Virtual Environment..."
+                echo "Running Django unit tests..."
                 sh '''
                     python3 -m venv venv
                     ./venv/bin/pip install -r requirements.txt
                     cd pettech
                     ../venv/bin/python manage.py test
                 '''
-                echo "Django tests passed."
             }
             post {
                 always {
@@ -42,69 +34,39 @@ pipeline {
             }
         }
 
-        // Stage 3: Build & Push Docker Image (เหมือนเดิม)
-        stage('Build & Push Docker Image') {
+        stage('Deploy: Build & Run All Services') {
             steps {
-                echo "Building Docker image: ${env.DOCKER_IMAGE}"
-                sh "docker build -t ${env.DOCKER_IMAGE} ."
-                withCredentials([usernamePassword(credentialsId: env.DOCKERHUB_CRED_ID, passwordVariable: 'DOCKERHUB_PASSWORD', usernameVariable: 'DOCKERHUB_USER')]) {
-                    echo "Logging in to Docker Hub..."
-                    sh 'echo $DOCKERHUB_PASSWORD | docker login --username $DOCKERHUB_USER --password-stdin'
-                    echo "Pushing image to Docker Hub..."
-                    sh "docker push ${env.DOCKER_IMAGE}"
-                }
-            }
-        }
-
-        // --- STAGE 4: DEPLOY โดยใช้ DOCKER-COMPOSE (แก้ไขใหม่ทั้งหมด) ---
-        stage('Deploy with Docker Compose') {
-            steps {
-                echo "Deploying application stack to ${env.REMOTE_HOST}"
+                echo "Deploying with docker compose..."
                 sshagent([SSH_CREDENTIALS]) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no ${env.REMOTE_HOST} '
-                            # 1. เข้าไปในโฟลเดอร์โปรเจกต์บน Server
-                            echo "1. Navigating to project directory: ${env.PROJECT_PATH}"
-                            cd ${env.PROJECT_PATH} 
+                        ssh -o StrictHostKeyChecking=no ${REMOTE_HOST} '
+                            set -e
+                            echo "Changing to app directory..."
+                            cd ${REMOTE_APP_DIR}
 
-                            # 2. อัปเดตโค้ดเวอร์ชันล่าสุดจาก Git
-                            echo "2. Pulling latest code from Git..."
-                            git pull
+                            echo "Building all services..."
+                            docker compose build
 
-                            # 3. ดึง Image หลักที่เพิ่ง Build มาใหม่ เพื่อความแน่นอน
-                            echo "3. Pulling latest application image from Docker Hub..."
-                            docker pull ${env.DOCKER_IMAGE}
+                            echo "Bringing up all containers..."
+                            docker compose up -d
 
-                            # 4. หยุดและลบ Container ทั้งหมดที่เคยรันไว้
-                            echo "4. Shutting down the old application stack..."
-                            docker-compose down
-
-                            # 5. สร้างและรัน Container ทั้ง 6 ตัวขึ้นมาใหม่จากไฟล์ docker-compose.yaml
-                            echo "5. Starting the new application stack..."
-                            docker-compose up -d
-
-                            # 6. แสดงสถานะของ Container ทั้งหมดที่รันอยู่
-                            echo "6. Verifying running services..."
-                            docker-compose ps
-                            
-                            echo "--- Deployment Complete ---"
+                            echo "Deployment completed."
                         '
                     """
                 }
             }
         }
     }
-    
+
     post {
         always {
-            echo 'Pipeline finished. Cleaning up...'
-            sh 'docker logout'
+            echo "Pipeline finished."
         }
         success {
-            echo 'Pipeline executed successfully!'
+            echo "✅ Deployment succeeded."
         }
         failure {
-            echo 'Pipeline failed!'
+            echo "❌ Deployment failed."
         }
     }
 }
