@@ -15,6 +15,8 @@ CSRF_TRUSTED_ORIGINS = list(set((locals().get('CSRF_TRUSTED_ORIGINS') or []) + [
 	"http://localhost:8002",
 	"http://localhost:8003",
 	"http://localhost:8004",
+	"http://35.247.173.141:8000",  # เพิ่มบรรทัดนี้! (external IP สำคัญ)
+    "https://35.247.173.141:8000",
 ]))
 
 # Tweak cookies for same-host proxying
