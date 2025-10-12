@@ -44,6 +44,8 @@ pipeline {
                             echo "Changing to app directory..."
                             cd ${REMOTE_APP_DIR}
 
+                            git pull origin cilent-side-rendering
+
                             echo "Building all services..."
                             docker compose build
 
