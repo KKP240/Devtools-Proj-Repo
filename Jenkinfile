@@ -49,7 +49,7 @@ pipeline {
                             git checkout test-jenkin-jo
                             git pull origin test-jenkin-jo  # เพิ่ม: อัปเดต code ล่าสุด
 
-                            echp "Stopping existing containers..."
+                            echo "Stopping existing containers..."
                             docker compose down
                             sleep 5
 
