@@ -145,6 +145,16 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 STATIC_ROOT = '/app/staticfiles'
+
+# CSRF Settings for production
+CSRF_TRUSTED_ORIGINS = [
+    'http://35.247.173.141:8000',  # เพิ่มบรรทัดนี้! (full scheme + IP + port สำคัญมาก)
+    'http://localhost:8000',  # สำหรับ local test
+]
+CSRF_COOKIE_SECURE = False  # สำหรับ HTTP (true ถ้า HTTPS)
+CSRF_COOKIE_SAMESITE = 'Lax'  # หรือ 'Strict' ถ้าต้องการ secure มากขึ้น
+SESSION_COOKIE_SECURE = False  # ถ้ามี session issue
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
