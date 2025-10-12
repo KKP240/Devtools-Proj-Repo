@@ -26,7 +26,10 @@ SECRET_KEY = 'django-insecure-gn7yl&ivvmyj9syhs1(69fpm*wgz492(!luw=zskzbm+)+l4!^
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = ['http://34.126.120.130', 'https://34.126.120.130']
 
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 
@@ -141,20 +144,6 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
-STATIC_ROOT = '/app/staticfiles'
-
-# CSRF Settings for production
-CSRF_TRUSTED_ORIGINS = [
-    'http://35.247.173.141:8000',  # IP ปัจจุบันของคุณ
-    'https://35.247.173.141:8000',  # สำหรับ HTTPS ถ้าเพิ่มทีหลัง
-    'http://localhost:8000',  # Local test
-    'http://127.0.0.1:8000',  # Internal
-    'http://34.126.120.130', 
-    'https://34.126.120.130'
-]
-CSRF_COOKIE_SECURE = False  # สำหรับ HTTP
-CSRF_COOKIE_SAMESITE = 'Lax'
-SESSION_COOKIE_SECURE = False
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
