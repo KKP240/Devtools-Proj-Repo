@@ -75,5 +75,53 @@ services:
     ports:
       - "5432:5432" # <-- เหลือไว้ได้ สำหรับเชื่อมต่อ Database จากภายนอก (ถ้าจำเป็น)
 
+# เพิ่ม Monitoring Services
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"  # Prometheus UI
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+    restart: unless-stopped
+
+  node-exporter:
+    image: prom/node-exporter
+    ports:
+      - "9100:9100"  # Node metrics
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"  # Grafana UI
+    volumes:
+      - grafana-storage:/var/lib/grafana  # Persistent data
+      - ./provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./provisioning/dashboards:/etc/grafana/provisioning/dashboards
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin  # เปลี่ยนรหัส (default admin/admin)
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+
 volumes:
   pgdata:
+  grafana-storage:  # เพิ่มสำหรับ Grafana data
+
+networks:
+  default:
+    driver: bridge
