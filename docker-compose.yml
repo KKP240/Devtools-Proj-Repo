@@ -74,7 +74,15 @@ services:
       - pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432" # <-- เหลือไว้ได้ สำหรับเชื่อมต่อ Database จากภายนอก (ถ้าจำเป็น)
-
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:0.11.0
+    command:
+      - -nginx.scrape-uri=http://gateway:80/stub_status  # Scrape Nginx status
+    ports:
+      - "9113:9113"  # Exporter port
+    depends_on:
+      - gateway
+    restart: unless-stopped
 # เพิ่ม Monitoring Services
   prometheus:
     image: prom/prometheus
