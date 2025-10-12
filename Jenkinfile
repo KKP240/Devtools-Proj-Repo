@@ -57,8 +57,10 @@ pipeline {
 
                             echo "Running database migrations (ปรับ service ถ้าต้องการ)..."
                             docker compose exec db sleep 10  # รอ DB เริ่ม
-                            docker compose exec users python /app/pettech/manage.py  # เพิ่ม: รัน migration บน service 'users'
-
+                            
+                            docker compose exec users python /app/pettech/manage.py migrate
+                            docker compose exec jobs python /app/pettech/manage.py migrate
+                            docker compose exec bookings python /app/pettech/manage.py migrate
                             echo "Deployment completed."
                         '
                     """
