@@ -3,7 +3,7 @@ services:
   gateway:
     image: nginx:1.27-alpine
     ports:
-      - "8000:80"
+      - "8000:80" # <-- เหลือ Port นี้ไว้เป็นประตูหลัก
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
     depends_on:
@@ -22,8 +22,8 @@ services:
       - .env
     depends_on:
       - db
-    ports:
-      - "8001:8000"
+    # ports:          # <-- เอาบรรทัดนี้ออก
+    #   - "8001:8000"
     restart: unless-stopped
 
   jobs:
@@ -35,8 +35,8 @@ services:
       - .env
     depends_on:
       - db
-    ports:
-      - "8002:8000"
+    # ports:          # <-- เอาบรรทัดนี้ออก
+    #   - "8002:8000"
     restart: unless-stopped
 
   bookings:
@@ -48,8 +48,8 @@ services:
       - .env
     depends_on:
       - db
-    ports:
-      - "8003:8000"
+    # ports:          # <-- เอาบรรทัดนี้ออก
+    #   - "8003:8000"
     restart: unless-stopped
 
   web:
@@ -61,9 +61,8 @@ services:
       - .env
     depends_on:
       - db
-    # Expose only inside compose network; gateway proxies it
-    ports:
-      - "8004:8000"
+    # ports:          # <-- เอาบรรทัดนี้ออก
+    #   - "8004:8000"
 
   db:
     image: postgres:15
@@ -74,7 +73,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5432:5432" # <-- เหลือไว้ได้ สำหรับเชื่อมต่อ Database จากภายนอก (ถ้าจำเป็น)
 
 volumes:
   pgdata:
