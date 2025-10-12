@@ -10,6 +10,9 @@ pipeline {
 
     stages {
         stage('Checkout Source') {
+            when {
+                branch 'test-jenkin-jo'
+            }
             steps {
                 git branch: 'test-jenkin-jo', url: 'https://github.com/KKP240/Devtools-Proj-Repo.git'
                 echo "Source code checked out successfully."
