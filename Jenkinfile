@@ -42,17 +42,9 @@ pipeline {
                         ssh -o StrictHostKeyChecking=no ${REMOTE_HOST} '
                             set -e
                             echo "Changing to app directory..."
-                            mkdir -p ${REMOTE_APP_DIR}  # เพิ่ม: สร้าง dir ถ้าไม่มี
                             cd ${REMOTE_APP_DIR}
-                            
-                            # เพิ่ม: Clone ถ้าไม่มี repo, มิฉะนั้น pull
-                            if [ ! -d ".git" ]; then
-                                git clone https://github.com/KKP240/Devtools-Proj-Repo.git .
-                                git checkout cilent-side-rendering
-                            else
-                                git checkout cilent-side-rendering
-                                git pull origin cilent-side-rendering
-                            fi
+                            git checkout cilent-side-rendering
+                            git pull origin cilent-side-rendering  # เพิ่ม: อัปเดต code ล่าสุด
 
                             echo "Building all services..."
                             docker compose build
@@ -60,9 +52,9 @@ pipeline {
                             echo "Bringing up all containers..."
                             docker compose up -d
 
-                            echo "Running database migrations..."
-                            docker compose exec db sleep 10
-                            docker compose exec users python manage.py migrate
+                            echo "Running database migrations (ปรับ service ถ้าต้องการ)..."
+                            docker compose exec db sleep 10  # รอ DB เริ่ม
+                            docker compose exec users python manage.py migrate  # เพิ่ม: รัน migration บน service 'users'
 
                             echo "Deployment completed."
                         '
