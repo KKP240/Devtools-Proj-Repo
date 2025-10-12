@@ -3,10 +3,9 @@ pipeline {
 
     environment {
         // Remote deployment info
-        REMOTE_HOST = 'aungodzilla2548@34.126.120.130'  // change to your actual user@ip
-        SSH_CREDENTIALS = 'ssh-prod_instance'     // Jenkins SSH credentials ID
-
-        REMOTE_APP_DIR = '/home/aungodzilla2548/Devtools-Proj-Repo/'          // This dir on the remote server must have docker-compose.yml and source code
+        REMOTE_HOST = 'kittipisphengcham@35.247.173.141'  // เปลี่ยนเป็น username@IP Docker VM จริง
+        SSH_CREDENTIALS = 'ssh-prod-instance'             // แก้จาก 'ssh-prod_instance' เป็น hyphen
+        REMOTE_APP_DIR = '/opt/pettech'                   // เปลี่ยนเป็น dir จริงบน Docker VM (clone repo ไปที่นี่)
     }
 
     stages {
@@ -43,12 +42,18 @@ pipeline {
                             set -e
                             echo "Changing to app directory..."
                             cd ${REMOTE_APP_DIR}
+                            git checkout cilent-side-rendering
+                            git pull origin cilent-side-rendering  # เพิ่ม: อัปเดต code ล่าสุด
 
                             echo "Building all services..."
                             docker compose build
 
                             echo "Bringing up all containers..."
                             docker compose up -d
+
+                            echo "Running database migrations (ปรับ service ถ้าต้องการ)..."
+                            docker compose exec db sleep 10  # รอ DB เริ่ม
+                            docker compose exec users python manage.py migrate  # เพิ่ม: รัน migration บน service 'users'
 
                             echo "Deployment completed."
                         '
