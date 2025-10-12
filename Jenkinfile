@@ -6,7 +6,7 @@ pipeline {
         REMOTE_HOST = 'nutthawat@34.126.120.130'  // change to your actual user@ip
         SSH_CREDENTIALS = 'ssh-prod_instance'     // Jenkins SSH credentials ID
 
-        REMOTE_APP_DIR = '/home/aungodzilla2548/Devtools-Proj-Repo/'          // This dir on the remote server must have docker-compose.yml and source code
+        REMOTE_APP_DIR = '/home/nutthawat/Devtools-Proj-Repo/'          // This dir on the remote server must have docker-compose.yml and source code
     }
 
     stages {
