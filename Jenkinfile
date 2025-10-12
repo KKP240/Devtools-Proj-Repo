@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         // Remote deployment info
-        REMOTE_HOST = 'jenkins_to_docker_key@34.126.120.130'  // change to your actual user@ip
+        REMOTE_HOST = 'nutthawat@34.126.120.130'  // change to your actual user@ip
         SSH_CREDENTIALS = 'ssh-prod_instance'     // Jenkins SSH credentials ID
 
         REMOTE_APP_DIR = '/home/aungodzilla2548/Devtools-Proj-Repo/'          // This dir on the remote server must have docker-compose.yml and source code
