@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Checkout Source') {
             steps {
-                git branch: 'cilent-side-rendering', url: 'https://github.com/KKP240/Devtools-Proj-Repo.git'
+                git branch: 'test-jenkin-jo', url: 'https://github.com/KKP240/Devtools-Proj-Repo.git'
                 echo "Source code checked out successfully."
             }
         }
@@ -43,8 +43,8 @@ pipeline {
                             set -e
                             echo "Changing to app directory..."
                             cd ${REMOTE_APP_DIR}
-                            git checkout cilent-side-rendering
-                            git pull origin cilent-side-rendering  # เพิ่ม: อัปเดต code ล่าสุด
+                            git checkout test-jenkin-jo
+                            git pull origin test-jenkin-jo  # เพิ่ม: อัปเดต code ล่าสุด
 
                             echo "Building all services..."
                             docker compose build
